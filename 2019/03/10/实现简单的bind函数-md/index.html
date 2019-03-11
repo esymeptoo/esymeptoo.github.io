@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="js,">
+  <meta name="keywords" content="js、es6,">
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="1234567Function.prototype.bind = function (...args) &amp;#123;	const self = this	const bindTarget = args.shift()	return function (...args1) &amp;#123;		return self.apply(bindTarget, [...args, ...args1])	&amp;#125">
-<meta name="keywords" content="js">
+<meta name="description" content="模拟传参实现1234567Function.prototype.bind = function (...args) &amp;#123;	const self = this	const bindTarget = args.shift()	return function (...args1) &amp;#123;		return self.apply(bindTarget, [...args, ...args1])">
+<meta name="keywords" content="js、es6">
 <meta property="og:type" content="article">
 <meta property="og:title" content="实现简单的bind函数.md">
 <meta property="og:url" content="http://yoursite.com/2019/03/10/实现简单的bind函数-md/index.html">
 <meta property="og:site_name" content="周小e丶的博客">
-<meta property="og:description" content="1234567Function.prototype.bind = function (...args) &amp;#123;	const self = this	const bindTarget = args.shift()	return function (...args1) &amp;#123;		return self.apply(bindTarget, [...args, ...args1])	&amp;#125">
+<meta property="og:description" content="模拟传参实现1234567Function.prototype.bind = function (...args) &amp;#123;	const self = this	const bindTarget = args.shift()	return function (...args1) &amp;#123;		return self.apply(bindTarget, [...args, ...args1])">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-11T02:15:21.832Z">
+<meta property="og:updated_time" content="2019-03-11T11:38:09.145Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="实现简单的bind函数.md">
-<meta name="twitter:description" content="1234567Function.prototype.bind = function (...args) &amp;#123;	const self = this	const bindTarget = args.shift()	return function (...args1) &amp;#123;		return self.apply(bindTarget, [...args, ...args1])	&amp;#125">
+<meta name="twitter:description" content="模拟传参实现1234567Function.prototype.bind = function (...args) &amp;#123;	const self = this	const bindTarget = args.shift()	return function (...args1) &amp;#123;		return self.apply(bindTarget, [...args, ...args1])">
 
 
 
@@ -300,7 +300,8 @@
       
 
       
-        <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.bind = <span class="function"><span class="keyword">function</span> (<span class="params">...args</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">const</span> self = <span class="keyword">this</span></span><br><span class="line">	<span class="keyword">const</span> bindTarget = args.shift()</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">...args1</span>) </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> self.apply(bindTarget, [...args, ...args1])</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h3 id="模拟传参实现"><a href="#模拟传参实现" class="headerlink" title="模拟传参实现"></a>模拟传参实现</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.bind = <span class="function"><span class="keyword">function</span> (<span class="params">...args</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">const</span> self = <span class="keyword">this</span></span><br><span class="line">	<span class="keyword">const</span> bindTarget = args.shift()</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">...args1</span>) </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> self.apply(bindTarget, [...args, ...args1])</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="完整版perf-加上构造函数作用域实现"><a href="#完整版perf-加上构造函数作用域实现" class="headerlink" title="完整版perf: 加上构造函数作用域实现"></a>完整版perf: 加上构造函数作用域实现</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.bind = <span class="built_in">Function</span>.prototype.bind || <span class="function"><span class="keyword">function</span> (<span class="params">context, ...args1</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> self = <span class="keyword">this</span></span><br><span class="line">  <span class="keyword">const</span> fBound = <span class="function"><span class="keyword">function</span> (<span class="params">...args2</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> self.apply(context, [...args1, ...args2])</span><br><span class="line">  &#125;</span><br><span class="line">  fBound.prototype = <span class="keyword">this</span>.prototype</span><br><span class="line">  <span class="keyword">return</span> fBound</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -318,7 +319,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/js/" rel="tag"># js</a>
+            <a href="/tags/js、es6/" rel="tag"># js、es6</a>
           
         </div>
       
@@ -391,8 +392,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -443,6 +453,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#模拟传参实现"><span class="nav-number">1.</span> <span class="nav-text">模拟传参实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#完整版perf-加上构造函数作用域实现"><span class="nav-number">2.</span> <span class="nav-text">完整版perf: 加上构造函数作用域实现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
