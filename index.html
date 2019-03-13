@@ -230,6 +230,139 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/12/探索vue-lazyload/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/12/探索vue-lazyload/" itemprop="url">探索vue-lazyload</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-12T13:36:29+08:00">
+                2019-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="有关vue的自定义指令"><a href="#有关vue的自定义指令" class="headerlink" title="有关vue的自定义指令"></a>有关vue的自定义指令</h3><ul>
+<li>生命周期[<a href="https://cn.vuejs.org/v2/guide/custom-directive.html]" target="_blank" rel="noopener">https://cn.vuejs.org/v2/guide/custom-directive.html]</a></li>
+</ul>
+<h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><pre><code>  对页面加载速度影响最大的就是图片，一张普通的图片可以达到几M的大小，
+而代码也许就只有几十KB。当页面图片很多时，页面的加载速度缓慢，
+几S钟内页面没有加载完成，也许会失去很多的用户。
+  所以，对于图片过多的页面，为了加速页面加载速度，所以很多时候我们
+需要将页面内未出现在可视区域内的图片先不做加载， 等到滚动到可视区
+域后再去加载。这样子对于页面加载性能上会有很大的提升，也提高了用户体验。
+</code></pre><h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><pre><code>  页面加载时将img标签中的src属性指向一张默认图片或者指向空并且设置高度，
+然后定义data-src属性指向真实的图片地址。
+  例如: &lt;img src=&quot;default.jpg&quot; data-src=&quot;http://xxxxx.jpg&quot; /&gt;
+  对屏幕滚动事件进行监听，判断哪些图片是暴露在视野里的将图片的src指向
+原来data-src指向的图片地址，就能实现简单的图片懒加载了
+</code></pre><h4 id="vue-lazyload实现"><a href="#vue-lazyload实现" class="headerlink" title="vue-lazyload实现"></a>vue-lazyload实现</h4>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/10/实现简单的bind函数-md/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -512,7 +645,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -525,7 +658,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
