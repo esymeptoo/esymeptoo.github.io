@@ -230,7 +230,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/12/探索vue-lazyload/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/13/函数节流和防抖/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -249,7 +249,127 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/03/12/探索vue-lazyload/" itemprop="url">探索vue-lazyload</a></h1>
+                <a class="post-title-link" href="/2019/03/13/函数节流和防抖/" itemprop="url">函数节流和防抖</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-13T16:12:03+08:00">
+                2019-03-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="函数节流"><a href="#函数节流" class="headerlink" title="函数节流"></a>函数节流</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">throttle</span> (<span class="params">action, delay</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timeout = <span class="literal">null</span></span><br><span class="line">  <span class="keyword">let</span> lastRun = <span class="number">0</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (timeout) &#123;</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> elapsed = <span class="built_in">Date</span>.now() - lastRun</span><br><span class="line">    <span class="keyword">let</span> context = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">let</span> args = <span class="built_in">arguments</span></span><br><span class="line">    <span class="keyword">let</span> runCallback = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      lastRun = <span class="built_in">Date</span>.now()</span><br><span class="line">      timeout = <span class="literal">false</span></span><br><span class="line">      action.apply(context, args)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (elapsed &gt;= delay) &#123;</span><br><span class="line">      runCallback()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      timeout = setTimeout(runCallback, delay)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="函数防抖"><a href="#函数防抖" class="headerlink" title="函数防抖"></a>函数防抖</h4>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/12/探索vue-lazyload(一)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/12/探索vue-lazyload(一)/" itemprop="url">探索vue-lazyload</a></h1>
         
 
         <div class="post-meta">
@@ -315,7 +435,21 @@
   例如: &lt;img src=&quot;default.jpg&quot; data-src=&quot;http://xxxxx.jpg&quot; /&gt;
   对屏幕滚动事件进行监听，判断哪些图片是暴露在视野里的将图片的src指向
 原来data-src指向的图片地址，就能实现简单的图片懒加载了
-</code></pre><h4 id="vue-lazyload实现"><a href="#vue-lazyload实现" class="headerlink" title="vue-lazyload实现"></a>vue-lazyload实现</h4>
+</code></pre><h4 id="vue-lazyload实现"><a href="#vue-lazyload实现" class="headerlink" title="vue-lazyload实现"></a>vue-lazyload实现</h4><ul>
+<li><p>index.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 既然是命令就需要使用加载指令的操作 先看install部分的代码</span></span><br><span class="line"><span class="comment">* 这部分代码声明了一个LazyClass和LazyContainer的实例,然后判断了当前vue的版本</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">const</span> LazyClass = Lazy(Vue)</span><br><span class="line"><span class="keyword">const</span> lazy = <span class="keyword">new</span> LazyClass(options)</span><br><span class="line"><span class="keyword">const</span> lazyContainer = <span class="keyword">new</span> LazyContainer(&#123; lazy &#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> isVue2 = Vue.version.split(<span class="string">'.'</span>)[<span class="number">0</span>] === <span class="string">'2'</span></span><br><span class="line"></span><br><span class="line">Vue.prototype.$Lazyload = lazy</span><br><span class="line">   </span><br><span class="line"><span class="comment">// 允许用户通过组件的方式实现懒加载</span></span><br><span class="line"><span class="keyword">if</span> (options.lazyComponent) &#123;</span><br><span class="line">  Vue.component(<span class="string">'lazy-component'</span>, LazyComponent(lazy))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (options.lazyImage) &#123;</span><br><span class="line">  Vue.component(<span class="string">'lazy-image'</span>, LazyImage(lazy))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>lazy.js</p>
+</li>
+</ul>
+<blockquote>
+<p>先看构造函数<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">constructor</span> (&#123; preLoad, error, throttleWait, preLoadTop, dispatchEvent, loading, attempt, silent = <span class="literal">true</span>, scale, listenEvents, hasbind, filter, adapter, observer, observerOptions &#125;) &#123;</span><br><span class="line">    <span class="keyword">this</span>.version = <span class="string">'__VUE_LAZYLOAD_VERSION__'</span></span><br><span class="line">    <span class="keyword">this</span>.mode = modeType.event</span><br><span class="line">    <span class="keyword">this</span>.ListenerQueue = []</span><br><span class="line">    <span class="keyword">this</span>.TargetIndex = <span class="number">0</span></span><br><span class="line">    <span class="keyword">this</span>.TargetQueue = []</span><br><span class="line">    <span class="comment">// 初始化实例参数</span></span><br><span class="line">    <span class="keyword">this</span>.options = &#123;</span><br><span class="line">      silent: silent,</span><br><span class="line">      dispatchEvent: !!dispatchEvent,</span><br><span class="line">      throttleWait: throttleWait || <span class="number">200</span>,</span><br><span class="line">      preLoad: preLoad || <span class="number">1.3</span>,</span><br><span class="line">      preLoadTop: preLoadTop || <span class="number">0</span>,</span><br><span class="line">      error: error || DEFAULT_URL,</span><br><span class="line">      loading: loading || DEFAULT_URL,</span><br><span class="line">      attempt: attempt || <span class="number">3</span>,</span><br><span class="line">      scale: scale || getDPR(scale),</span><br><span class="line">      ListenEvents: listenEvents || DEFAULT_EVENTS,</span><br><span class="line">      hasbind: <span class="literal">false</span>,</span><br><span class="line">      supportWebp: supportWebp(),</span><br><span class="line">      filter: filter || &#123;&#125;,</span><br><span class="line">      adapter: adapter || &#123;&#125;,</span><br><span class="line">      observer: !!observer,</span><br><span class="line">      observerOptions: observerOptions || DEFAULT_OBSERVER_OPTIONS</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 注册事件 on、emit、remove、once等</span></span><br><span class="line">    <span class="keyword">this</span>._initEvent()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">this</span>.lazyLoadHandler = throttle(<span class="keyword">this</span>._lazyLoadHandler.bind(<span class="keyword">this</span>), <span class="keyword">this</span>.options.throttleWait)</span><br><span class="line">    <span class="comment">// 设置监测模式 addEventListener/IntersectionObserver Api 这个后面再讲</span></span><br><span class="line">    <span class="keyword">this</span>.setMode(<span class="keyword">this</span>.options.observer ? modeType.observer : modeType.event)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>_lazyLoadHandler<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 这是event模式下触发懒加载的核心功能</span></span><br><span class="line"><span class="comment">* 遍历懒加载节点队列 将已经加载移除 没有加载的先判断是否在视野范围内 在就执行listener.load()进行加载</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">  _lazyLoadHandler () &#123;</span><br><span class="line">      <span class="keyword">const</span> freeList = []</span><br><span class="line">      <span class="keyword">this</span>.ListenerQueue.forEach(<span class="function">(<span class="params">listener, index</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!listener.state.error &amp;&amp; listener.state.loaded) &#123;</span><br><span class="line">          <span class="keyword">return</span> freeList.push(listener)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">const</span> catIn = listener.checkInView()</span><br><span class="line">        <span class="keyword">if</span> (!catIn) <span class="keyword">return</span></span><br><span class="line">        listener.load()</span><br><span class="line">      &#125;)</span><br><span class="line">      freeList.forEach(<span class="function"><span class="params">vm</span> =&gt;</span> remove(<span class="keyword">this</span>.ListenerQueue, vm))</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>那么问题来了，这个listener到底是何方神圣呢?<br>下面就看看指令周期内的做了什么?<br>上代码!!!<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Vue.directive(<span class="string">'lazy'</span>, &#123;</span><br><span class="line">  bind: lazy.add.bind(lazy),</span><br><span class="line">  update: lazy.update.bind(lazy),</span><br><span class="line">  componentUpdated: lazy.lazyLoadHandler.bind(lazy),</span><br><span class="line">  unbind: lazy.remove.bind(lazy)</span><br><span class="line">&#125;)</span><br><span class="line">Vue.directive(<span class="string">'lazy-container'</span>, &#123;</span><br><span class="line">  bind: lazyContainer.bind.bind(lazyContainer),</span><br><span class="line">  componentUpdated: lazyContainer.update.bind(lazyContainer),</span><br><span class="line">  unbind: lazyContainer.unbind.bind(lazyContainer)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+
           
         
       
@@ -645,7 +779,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -658,7 +792,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
