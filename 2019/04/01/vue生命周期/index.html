@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="vue、笔记,">
 
 
 
@@ -79,14 +79,20 @@
 
 
 
-<meta name="keywords" content="前端、吹比">
-<meta property="og:type" content="website">
-<meta property="og:title" content="周小e丶的博客">
-<meta property="og:url" content="http://yoursite.com/archives/2019/01/index.html">
+<meta name="description" content="vue生命周期(几个钩子函数的区别)先看一张图  vue周期的执行顺序如下:  beforeCreate  字面意思，组件创建之前 已经完成了初始化事件等  此时还不能访问到data里的数据 因此不能在这个钩子里执行渲染逻辑(api或者data赋值操作)   data  初始化data的过程   providecreated  此时已经能够访问data template还没有编译好   befor">
+<meta name="keywords" content="vue、笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vue生命周期">
+<meta property="og:url" content="http://yoursite.com/2019/04/01/vue生命周期/index.html">
 <meta property="og:site_name" content="周小e丶的博客">
+<meta property="og:description" content="vue生命周期(几个钩子函数的区别)先看一张图  vue周期的执行顺序如下:  beforeCreate  字面意思，组件创建之前 已经完成了初始化事件等  此时还不能访问到data里的数据 因此不能在这个钩子里执行渲染逻辑(api或者data赋值操作)   data  初始化data的过程   providecreated  此时已经能够访问data template还没有编译好   befor">
 <meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/public/images/vue-hooks.png">
+<meta property="og:updated_time" content="2019-04-01T07:42:45.766Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="周小e丶的博客">
+<meta name="twitter:title" content="vue生命周期">
+<meta name="twitter:description" content="vue生命周期(几个钩子函数的区别)先看一张图  vue周期的执行顺序如下:  beforeCreate  字面意思，组件创建之前 已经完成了初始化事件等  此时还不能访问到data里的数据 因此不能在这个钩子里执行渲染逻辑(api或者data赋值操作)   data  初始化data的过程   providecreated  此时已经能够访问data template还没有编译好   befor">
+<meta name="twitter:image" content="http://yoursite.com/public/images/vue-hooks.png">
 
 
 
@@ -116,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/archives/2019/01/">
+  <link rel="canonical" href="http://yoursite.com/2019/04/01/vue生命周期/">
 
 
 
 
 
-  <title>Archive | 周小e丶的博客</title>
+  <title>vue生命周期 | 周小e丶的博客</title>
   
 
 
@@ -141,7 +147,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -215,72 +221,178 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
-
-      <span class="archive-page-counter">
-        
-        
-        
-          
-        
-        Um..! 8 posts in total. Keep on posting.
-      </span>
-
-      
-
-        
-        
-        
-
-        
-          
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2019">2019</h1>
-          </div>
-        
-        
-
-        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/01/vue生命周期/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2019/01/12/探索vue-lazyload(一)/" itemprop="url">
-              
-                <span itemprop="name">探索vue-lazyload</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">vue生命周期</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-01-12T13:36:29+08:00" content="2019-01-12">
-          01-12
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-01T15:21:35+08:00">
+                2019-04-01
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
 
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
+      
 
+      
+        <h4 id="vue生命周期-几个钩子函数的区别"><a href="#vue生命周期-几个钩子函数的区别" class="headerlink" title="vue生命周期(几个钩子函数的区别)"></a>vue生命周期(几个钩子函数的区别)</h4><p>先看一张图<br><img src="/public/images/vue-hooks.png" alt="vue"></p>
+<ul>
+<li><p>vue周期的执行顺序如下:</p>
+<blockquote>
+<p>beforeCreate<br>  字面意思，组件创建之前 已经完成了初始化事件等<br>  此时还不能访问到data里的数据 因此不能在这个钩子里执行渲染逻辑(api或者data赋值操作)</p>
+</blockquote>
+<blockquote>
+<p>data<br>  初始化data的过程</p>
+</blockquote>
+<blockquote>
+<p>provide<br>created<br>  此时已经能够访问data template还没有编译好</p>
+</blockquote>
+<blockquote>
+<p>beforeMount<br>  已完成模板数据装载 但是还没有$el</p>
+</blockquote>
+<blockquote>
+<p>mounted<br>  已将模板渲染到节点上 此时才有$el 可以进行dom操作</p>
+</blockquote>
+<blockquote>
+<p>beforeUpdate</p>
+</blockquote>
+<blockquote>
+<p>updated</p>
+</blockquote>
+<blockquote>
+<p>beforeDestroy</p>
+</blockquote>
+<blockquote>
+<p>destroyed</p>
+</blockquote>
+</li>
+</ul>
+
+      
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/vue、笔记/" rel="tag"># vue、笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/01/vue-provide-inject/" rel="next" title="vue-provide/inject">
+                <i class="fa fa-chevron-left"></i> vue-provide/inject
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -288,6 +400,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -308,8 +424,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -360,6 +485,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#vue生命周期-几个钩子函数的区别"><span class="nav-number">1.</span> <span class="nav-text">vue生命周期(几个钩子函数的区别)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -493,6 +634,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
