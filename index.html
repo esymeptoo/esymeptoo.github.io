@@ -230,6 +230,261 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/01/vue-provide-inject/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/01/vue-provide-inject/" itemprop="url">vue-provide/inject</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-01T15:02:07+08:00">
+                2019-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="provide-inject"><a href="#provide-inject" class="headerlink" title="provide/inject"></a>provide/inject</h3><p>provide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传</p>
+<ul>
+<li>provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例 </li>
+<li>inject接收数组或者属性对象集合</li>
+</ul>
+<h4 id="举个🌰-我们列举三个组件-祖先、父组件、子组件"><a href="#举个🌰-我们列举三个组件-祖先、父组件、子组件" class="headerlink" title="举个🌰 我们列举三个组件  祖先、父组件、子组件"></a>举个🌰 我们列举三个组件  祖先、父组件、子组件</h4><p>grandPa.vue<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  // provide的传递方法可以为对象也可以为函数 通常情况下如果传递的值与当前组件无关 则使用对象形式</span><br><span class="line">  provide() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      grandPa: this,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  provide: &#123;</span><br><span class="line">    grandPa: this,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>father.vue<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  // inject用法和props类似</span><br><span class="line">  inject: [&apos;grandPa&apos;],</span><br><span class="line">  // 也可写成如下方式</span><br><span class="line">  inject: &#123;</span><br><span class="line">    grandPa: &#123;</span><br><span class="line">      type: Object,</span><br><span class="line">      default: () =&gt; (&#123;&#125;),</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="provide的执行时机"><a href="#provide的执行时机" class="headerlink" title="provide的执行时机"></a>provide的执行时机</h4><p>provide的执行时机出于data和created之间</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/22/react-redux源码解读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/22/react-redux源码解读/" itemprop="url">react-redux源码解读</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-22T14:43:31+08:00">
+                2019-03-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="react-redux源码解读"><a href="#react-redux源码解读" class="headerlink" title="react-redux源码解读"></a>react-redux源码解读</h2><p>上一篇翻了一下redux的源码 这一篇就研究下react-redux吧<br>原理大家都知道 就是利用react的Context Api<br>那我们看看它是怎么在react应用中施展魔法的吧~~</p>
+<p>我们先看Provider这个组件吧 毕竟他也是react使用redux的入口 也是关联store的第一环</p>
+<h4 id="Provider-js"><a href="#Provider-js" class="headerlink" title="Provider.js"></a>Provider.js</h4><p>Provider是一个react组件 接收三个props</p>
+<ol>
+<li>store</li>
+<li>context</li>
+<li>children</li>
+</ol>
+<p>看代码<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Provider</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">  * 将store和store当前的state保存在组件的state上</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line">  <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">    <span class="keyword">super</span>(props)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> &#123; store &#125; = props</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.state = &#123;</span><br><span class="line">      storeState: store.getState(),</span><br><span class="line">      store</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 组件加载完执行subscribe</span></span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="keyword">this</span>._isMounted = <span class="literal">true</span></span><br><span class="line">    <span class="keyword">this</span>.subscribe()</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 组件卸载之前</span></span><br><span class="line">  componentWillUnmount() &#123;</span><br><span class="line">    <span class="comment">// 取消监听</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.unsubscribe) <span class="keyword">this</span>.unsubscribe()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>._isMounted = <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 组件更新结束 如果store的引用变了 如果已经有监听 取消监听 重新监听</span></span><br><span class="line">  <span class="comment">// 引用变了是指 执行reducer的过程中 redux/combineReducers里的hasChanged相对之前发生了变化</span></span><br><span class="line">  componentDidUpdate(prevProps) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.props.store !== prevProps.store) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.unsubscribe) <span class="keyword">this</span>.unsubscribe()</span><br><span class="line"></span><br><span class="line">      <span class="keyword">this</span>.subscribe()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  subscribe() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; store &#125; = <span class="keyword">this</span>.props</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 对store添加监听</span></span><br><span class="line">    <span class="keyword">this</span>.unsubscribe = store.subscribe(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 更新后的store树</span></span><br><span class="line">      <span class="keyword">const</span> newStoreState = store.getState()</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 如果组件在卸载前 return</span></span><br><span class="line">      <span class="keyword">if</span> (!<span class="keyword">this</span>._isMounted) &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line">      </span><br><span class="line">      <span class="comment">// 比较新旧store 减少不必要的更新</span></span><br><span class="line">      <span class="keyword">this</span>.setState(<span class="function"><span class="params">providerState</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// If the value is the same, skip the unnecessary state update.</span></span><br><span class="line">        <span class="keyword">if</span> (providerState.storeState === newStoreState) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="literal">null</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> &#123; <span class="attr">storeState</span>: newStoreState &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">      </span><br><span class="line">    <span class="comment">// dispatch动作可能在render和componentDidUpdate之间进行 手动同步store</span></span><br><span class="line">    <span class="comment">// Actions might have been dispatched between render and mount - handle those</span></span><br><span class="line">    <span class="keyword">const</span> postMountStoreState = store.getState()</span><br><span class="line">    <span class="keyword">if</span> (postMountStoreState !== <span class="keyword">this</span>.state.storeState) &#123;</span><br><span class="line">      <span class="keyword">this</span>.setState(&#123; <span class="attr">storeState</span>: postMountStoreState &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> Context = <span class="keyword">this</span>.props.context || ReactReduxContext</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="comment">// 使用Context包裹children</span></span><br><span class="line">      &lt;Context.Provider value=&#123;<span class="keyword">this</span>.state&#125;&gt;</span><br><span class="line">        &#123;<span class="keyword">this</span>.props.children&#125;</span><br><span class="line">      &lt;<span class="regexp">/Context.Provider&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/20/读redux源码/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -329,7 +584,7 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 看到这段代码 我觉得猜测是对的 是不是有点像上面的loggerEnhancer的结构 重写dispatch方法</span></span><br><span class="line"><span class="comment">// 所以得出结论 与其说增强器是对store的增强不如说是对dispatch的增强</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">applyMiddleware</span>(<span class="params">...middlewares</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="params">createStore</span> =&gt;</span> (...args) =&gt; &#123;</span><br><span class="line">    <span class="comment">// 这里的...args是 reducers、preloadedState、enhancer</span></span><br><span class="line">    <span class="keyword">const</span> store = createStore(...args)</span><br><span class="line">    <span class="keyword">let</span> dispatch = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(</span><br><span class="line">        <span class="string">`Dispatching while constructing your middleware is not allowed. `</span> +</span><br><span class="line">          <span class="string">`Other middleware would not be applied to this dispatch.`</span></span><br><span class="line">      )</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> middlewareAPI = &#123;</span><br><span class="line">      getState: store.getState,</span><br><span class="line">      dispatch: <span class="function">(<span class="params">...args</span>) =&gt;</span> dispatch(...args)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> chain = middlewares.map(<span class="function"><span class="params">middleware</span> =&gt;</span> middleware(middlewareAPI))</span><br><span class="line">    <span class="comment">// 这里的compose的作用是包裹所有dispatch操作</span></span><br><span class="line">    dispatch = compose(...chain)(store.dispatch)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      ...store,</span><br><span class="line">      dispatch</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>我们再写个使用applyMiddleware小demo 通过demo我们再进行设想<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; createStore, applyMiddleware, compose &#125; = <span class="built_in">require</span>(<span class="string">'redux'</span>)</span><br><span class="line"><span class="keyword">const</span> initialState = &#123;</span><br><span class="line">  count: <span class="number">1</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">count1</span>(<span class="params">state = initialState, action</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">switch</span> (action.type) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'ADD'</span>:</span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        ...state,</span><br><span class="line">        count: state.count + <span class="number">1</span>,</span><br><span class="line">      &#125;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">      <span class="keyword">return</span> state</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> store = createStore(count1, applyMiddleware(fn1, fn2))</span><br><span class="line"></span><br><span class="line"><span class="comment">// 上面两个fn1和fn2我们都没定义 现在我们根据applyMiddleware猜测一下fn1和fn2是啥样子的</span></span><br><span class="line"><span class="comment">// 根据loggerEnhancer的设想 </span></span><br><span class="line"><span class="keyword">const</span> enhancer = <span class="function"><span class="params">createStore</span> =&gt;</span> (reducers, preloadedState, enhancer) =&gt; &#123;&#125; </span><br><span class="line"><span class="comment">// applyMiddleware也应该是这样的函数体</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> chain = middlewares.map(<span class="function"><span class="params">middleware</span> =&gt;</span> middleware(middlewareAPI))</span><br><span class="line"><span class="comment">// 这行代码可以看出 fn1的雏形 应该是这样的</span></span><br><span class="line"><span class="keyword">const</span> fn1 = <span class="function">(<span class="params">&#123; dispatch, getState &#125;</span>) =&gt;</span> &#123;&#125;</span><br><span class="line"><span class="comment">// 但是通过compose方法还能接受store.dispatch作为入参 说明fn1应该是这样的</span></span><br><span class="line"><span class="keyword">const</span> fn1 = <span class="function">(<span class="params">&#123; dispatch, getState &#125;</span>) =&gt;</span> dispatch =&gt; &#123;&#125;</span><br><span class="line"><span class="comment">// 通过返回的是一个dispatch 我可以知道fn1原来是这样的</span></span><br><span class="line"><span class="keyword">const</span> fn1 = <span class="function">(<span class="params">&#123; dispatch, getState &#125;</span>) =&gt;</span> dispatch =&gt; <span class="function"><span class="params">action</span> =&gt;</span> &#123;&#125;</span><br><span class="line"><span class="comment">// 举个栗子</span></span><br><span class="line"><span class="keyword">const</span> a = <span class="function"><span class="params">dispatch</span> =&gt;</span> action =&gt; &#123;&#125;</span><br><span class="line"><span class="keyword">const</span> b = <span class="function"><span class="params">dispatch</span> =&gt;</span> action =&gt; &#123;&#125;</span><br><span class="line"><span class="comment">// compose([a, b])的结果为 (...args) =&gt; a(b(...args))</span></span><br><span class="line"><span class="comment">// compose([a, b])(store.dispatch) 结果为 a(b(dispatch)) 再做简化就是a(action =&gt; &#123;&#125;)</span></span><br><span class="line"><span class="comment">// 从这里可以看出 a执行的dispatch其实就是 b(dispatch)的结果 </span></span><br><span class="line"><span class="comment">// 如果还有c c执行dispatch就是a(dispatch) 从而达到中间件的作用</span></span><br><span class="line"><span class="comment">// a执行的dispatch就是dispatch</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 举个更确切的栗子</span></span><br><span class="line"><span class="keyword">const</span> fn1 = <span class="function"><span class="params">store</span> =&gt;</span> next =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'next1'</span>)</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="params">action</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'fn1'</span>)</span><br><span class="line">    next(action)</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'fn1'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> fn2 = <span class="function"><span class="params">store</span> =&gt;</span> next =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'next2'</span>)</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="params">action</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'fn2'</span>)</span><br><span class="line">    next(action)</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'fn2'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 在执行applyMiddleware时  执行了compose(...chain)(store.sidpatch) 执行顺序是 next2 、 next1  这是中间件入栈的顺序</span></span><br><span class="line"><span class="comment">* 但是调用的顺序不一样  有兴趣可以了解一下洋葱模型</span></span><br><span class="line"><span class="comment">* 执行store.dispatch(action1) 实际打印顺序是 fn1、fn2、fn2、fn1</span></span><br><span class="line"><span class="comment">* fn2在传入store.dispatch的时候 会将</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">const</span> dispatchFromStore = <span class="function"><span class="params">action</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'fn2'</span>)</span><br><span class="line">  next(action)</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'fn2'</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 当做返回值传给fn1的next</span></span><br><span class="line"><span class="comment">* 那fn1的执行过程就是</span></span><br><span class="line"><span class="comment">* */</span></span><br><span class="line"><span class="keyword">const</span> dispatchFromFn2 = <span class="function"><span class="params">action</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'fn1'</span>)</span><br><span class="line">  dispatchFromStore(action)</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'fn1'</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 所以打印顺序是fn1、fn2、fn2、fn1就不奇怪了</span></span><br></pre></td></tr></table></figure></p>
 <h4 id="bindActionCreators-js"><a href="#bindActionCreators-js" class="headerlink" title="bindActionCreators.js"></a>bindActionCreators.js</h4><p>这个文件没有被主函数用到 是被暴露给开发者使用的一个工具函数 用来更方便的组合你的action</p>
-<h4 id="createStore-observer方法"><a href="#createStore-observer方法" class="headerlink" title="createStore/observer方法"></a>createStore/observer方法</h4><p>这个方法上面没有讲到 也是暴露给开发者的API我们放到下一章讲</p>
+<h4 id="createStore-observer方法"><a href="#createStore-observer方法" class="headerlink" title="createStore/observer方法"></a>createStore/observer方法</h4><p>这个方法上面没有讲到 也是暴露给开发者的API 我们放到以后讲</p>
 <h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p>这一遍过下来基本就能熟练使用redux的大部分特性了 也感叹代码的精妙 尤其是组合中间件的代码 nb~</p>
 
           
@@ -960,7 +1215,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -973,7 +1228,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
