@@ -230,284 +230,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/01/vue生命周期/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="周小e丶">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="周小e丶的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/01/vue生命周期/" itemprop="url">vue生命周期</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-01T15:21:35+08:00">
-                2019-04-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="vue生命周期-几个钩子函数的区别"><a href="#vue生命周期-几个钩子函数的区别" class="headerlink" title="vue生命周期(几个钩子函数的区别)"></a>vue生命周期(几个钩子函数的区别)</h4><p>先看一张图<br><img src="https://image-static.segmentfault.com/350/409/3504099265-580628fd03258_articlex" alt="vue"></p>
-<ul>
-<li><p>vue周期的执行顺序如下:</p>
-<blockquote>
-<p>beforeCreate<br>  字面意思，组件创建之前 已经完成了初始化事件等<br>  此时还不能访问到data里的数据 因此不能在这个钩子里执行渲染逻辑(api或者data赋值操作)</p>
-</blockquote>
-<blockquote>
-<p>data<br>  初始化data的过程</p>
-</blockquote>
-<blockquote>
-<p>provide<br>created<br>  此时已经能够访问data template还没有编译好</p>
-</blockquote>
-<blockquote>
-<p>beforeMount<br>  已完成模板数据装载 但是还没有$el</p>
-</blockquote>
-<blockquote>
-<p>mounted<br>  已将模板渲染到节点上 此时才有$el 可以进行dom操作</p>
-</blockquote>
-<blockquote>
-<p>beforeUpdate</p>
-</blockquote>
-<blockquote>
-<p>updated</p>
-</blockquote>
-<blockquote>
-<p>beforeDestroy</p>
-</blockquote>
-<blockquote>
-<p>destroyed</p>
-</blockquote>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/01/vue-provide-inject/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="周小e丶">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="周小e丶的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/01/vue-provide-inject/" itemprop="url">vue-provide/inject</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-01T15:02:07+08:00">
-                2019-04-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="provide-inject"><a href="#provide-inject" class="headerlink" title="provide/inject"></a>provide/inject</h3><p>provide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传</p>
-<ul>
-<li>provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例 </li>
-<li>inject接收数组或者属性对象集合</li>
-</ul>
-<h4 id="举个🌰-我们列举三个组件-祖先、父组件、子组件"><a href="#举个🌰-我们列举三个组件-祖先、父组件、子组件" class="headerlink" title="举个🌰 我们列举三个组件  祖先、父组件、子组件"></a>举个🌰 我们列举三个组件  祖先、父组件、子组件</h4><p>grandPa.vue<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  // provide的传递方法可以为对象也可以为函数 通常情况下如果传递的值与当前组件无关 则使用对象形式</span><br><span class="line">  provide() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      grandPa: this,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  provide: &#123;</span><br><span class="line">    grandPa: this,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>father.vue<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  // inject用法和props类似</span><br><span class="line">  inject: [&apos;grandPa&apos;],</span><br><span class="line">  // 也可写成如下方式</span><br><span class="line">  inject: &#123;</span><br><span class="line">    grandPa: &#123;</span><br><span class="line">      type: Object,</span><br><span class="line">      default: () =&gt; (&#123;&#125;),</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h4 id="provide的执行时机"><a href="#provide的执行时机" class="headerlink" title="provide的执行时机"></a>provide的执行时机</h4><p>provide的执行时机出于data和created之间</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/22/react-redux源码解读/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -580,15 +302,44 @@
         
           
             <h2 id="react-redux源码解读"><a href="#react-redux源码解读" class="headerlink" title="react-redux源码解读"></a>react-redux源码解读</h2><p>上一篇翻了一下redux的源码 这一篇就研究下react-redux吧<br>原理大家都知道 就是利用react的Context Api<br>那我们看看它是怎么在react应用中施展魔法的吧~~</p>
-<p>我们先看Provider这个组件吧 毕竟他也是react使用redux的入口 也是关联store的第一环</p>
-<h4 id="Provider-js"><a href="#Provider-js" class="headerlink" title="Provider.js"></a>Provider.js</h4><p>Provider是一个react组件 接收三个props</p>
+<p>看代码 先看index.js</p>
+<h4 id="src-index-js"><a href="#src-index-js" class="headerlink" title="src/index.js"></a>src/index.js</h4><p>这个文件是主入口  暴露出 Provider/connectAdvanced/ReactReduxContext/connect四个核心方法</p>
+<ol>
+<li>其中，Provider是个react组件 是存储store数的根节点</li>
+<li>ReactReduxContext是个react context，所有子组件的都要从这个context获取store的数据</li>
+<li>connect 是关联组件和store的方法</li>
+<li>connectAdvanced 是一个高阶组件 负责将connect的参数进行封装添加到子组件的props上</li>
+</ol>
+<figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Provider <span class="keyword">from</span> <span class="string">'./components/Provider'</span></span><br><span class="line"><span class="keyword">import</span> connectAdvanced <span class="keyword">from</span> <span class="string">'./components/connectAdvanced'</span></span><br><span class="line"><span class="keyword">import</span> &#123; ReactReduxContext &#125; <span class="keyword">from</span> <span class="string">'./components/Context'</span></span><br><span class="line"><span class="keyword">import</span> connect <span class="keyword">from</span> <span class="string">'./connect/connect'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> &#123; Provider, connectAdvanced, ReactReduxContext, connect &#125;</span><br></pre></td></tr></table></figure>
+<p>看到这几个方法就能猜到react-redux到底做了什么？难点在哪里？怎么避免不必要的渲染？以及使用高阶函数时对于ref的转发？</p>
+<p>我们不妨先看Provider这个组件吧 毕竟他也是react使用redux的入口 也是关联store的第一环</p>
+<h4 id="src-components-Provider-js"><a href="#src-components-Provider-js" class="headerlink" title="src/components/Provider.js"></a>src/components/Provider.js</h4><p>Provider是一个react组件 接收三个props</p>
 <ol>
 <li>store</li>
 <li>context</li>
-<li>children</li>
+<li>children<br>由此我们猜测 react-redux内部肯定会使用相当多的闭包进行缓存以避免不必要的渲染<br>结合connect的使用 推断会有根据storeState和ownProps进行判断是否进行渲染的逻辑 也理应会有</li>
 </ol>
-<p>看代码<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Provider</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">  * 将store和store当前的state保存在组件的state上</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line">  <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">    <span class="keyword">super</span>(props)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> &#123; store &#125; = props</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.state = &#123;</span><br><span class="line">      storeState: store.getState(),</span><br><span class="line">      store</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 组件加载完执行subscribe</span></span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="keyword">this</span>._isMounted = <span class="literal">true</span></span><br><span class="line">    <span class="keyword">this</span>.subscribe()</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 组件卸载之前</span></span><br><span class="line">  componentWillUnmount() &#123;</span><br><span class="line">    <span class="comment">// 取消监听</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.unsubscribe) <span class="keyword">this</span>.unsubscribe()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>._isMounted = <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 组件更新结束 如果store的引用变了 如果已经有监听 取消监听 重新监听</span></span><br><span class="line">  <span class="comment">// 引用变了是指 执行reducer的过程中 redux/combineReducers里的hasChanged相对之前发生了变化</span></span><br><span class="line">  componentDidUpdate(prevProps) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.props.store !== prevProps.store) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.unsubscribe) <span class="keyword">this</span>.unsubscribe()</span><br><span class="line"></span><br><span class="line">      <span class="keyword">this</span>.subscribe()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  subscribe() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; store &#125; = <span class="keyword">this</span>.props</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 对store添加监听</span></span><br><span class="line">    <span class="keyword">this</span>.unsubscribe = store.subscribe(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 更新后的store树</span></span><br><span class="line">      <span class="keyword">const</span> newStoreState = store.getState()</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 如果组件在卸载前 return</span></span><br><span class="line">      <span class="keyword">if</span> (!<span class="keyword">this</span>._isMounted) &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line">      </span><br><span class="line">      <span class="comment">// 比较新旧store 减少不必要的更新</span></span><br><span class="line">      <span class="keyword">this</span>.setState(<span class="function"><span class="params">providerState</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// If the value is the same, skip the unnecessary state update.</span></span><br><span class="line">        <span class="keyword">if</span> (providerState.storeState === newStoreState) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="literal">null</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> &#123; <span class="attr">storeState</span>: newStoreState &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">      </span><br><span class="line">    <span class="comment">// dispatch动作可能在render和componentDidUpdate之间进行 手动同步store</span></span><br><span class="line">    <span class="comment">// Actions might have been dispatched between render and mount - handle those</span></span><br><span class="line">    <span class="keyword">const</span> postMountStoreState = store.getState()</span><br><span class="line">    <span class="keyword">if</span> (postMountStoreState !== <span class="keyword">this</span>.state.storeState) &#123;</span><br><span class="line">      <span class="keyword">this</span>.setState(&#123; <span class="attr">storeState</span>: postMountStoreState &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> Context = <span class="keyword">this</span>.props.context || ReactReduxContext</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="comment">// 使用Context包裹children</span></span><br><span class="line">      &lt;Context.Provider value=&#123;<span class="keyword">this</span>.state&#125;&gt;</span><br><span class="line">        &#123;<span class="keyword">this</span>.props.children&#125;</span><br><span class="line">      &lt;<span class="regexp">/Context.Provider&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure></p>
-
+<figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Provider</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    * 将store和store当前的state保存在组件的state上</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">      <span class="keyword">super</span>(props)</span><br><span class="line">  </span><br><span class="line">      <span class="keyword">const</span> &#123; store &#125; = props</span><br><span class="line">  </span><br><span class="line">      <span class="keyword">this</span>.state = &#123;</span><br><span class="line">        storeState: store.getState(),</span><br><span class="line">        store</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// 组件加载完执行subscribe</span></span><br><span class="line">    componentDidMount() &#123;</span><br><span class="line">      <span class="keyword">this</span>._isMounted = <span class="literal">true</span></span><br><span class="line">      <span class="keyword">this</span>.subscribe()</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 组件卸载之前</span></span><br><span class="line">    componentWillUnmount() &#123;</span><br><span class="line">      <span class="comment">// 取消监听</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.unsubscribe) <span class="keyword">this</span>.unsubscribe()</span><br><span class="line">  </span><br><span class="line">      <span class="keyword">this</span>._isMounted = <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// 组件更新结束 如果store的引用变了 如果已经有监听 取消监听 重新监听</span></span><br><span class="line">    <span class="comment">// 引用变了是指 执行reducer的过程中 redux/combineReducers里的hasChanged相对之前发生了变化</span></span><br><span class="line">    componentDidUpdate(prevProps) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.props.store !== prevProps.store) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.unsubscribe) <span class="keyword">this</span>.unsubscribe()</span><br><span class="line">  </span><br><span class="line">        <span class="keyword">this</span>.subscribe()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    subscribe() &#123;</span><br><span class="line">      <span class="keyword">const</span> &#123; store &#125; = <span class="keyword">this</span>.props</span><br><span class="line">      </span><br><span class="line">      <span class="comment">// 对store添加监听</span></span><br><span class="line">      <span class="keyword">this</span>.unsubscribe = store.subscribe(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 更新后的store树</span></span><br><span class="line">        <span class="keyword">const</span> newStoreState = store.getState()</span><br><span class="line">  </span><br><span class="line">        <span class="comment">// 如果组件在卸载前 return</span></span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">this</span>._isMounted) &#123;</span><br><span class="line">          <span class="keyword">return</span></span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 比较新旧store 减少不必要的更新</span></span><br><span class="line">        <span class="keyword">this</span>.setState(<span class="function"><span class="params">providerState</span> =&gt;</span> &#123;</span><br><span class="line">          <span class="comment">// If the value is the same, skip the unnecessary state update.</span></span><br><span class="line">          <span class="keyword">if</span> (providerState.storeState === newStoreState) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span></span><br><span class="line">          &#125;</span><br><span class="line">  </span><br><span class="line">          <span class="keyword">return</span> &#123; <span class="attr">storeState</span>: newStoreState &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;)</span><br><span class="line">        </span><br><span class="line">      <span class="comment">// dispatch动作可能在render和componentDidUpdate之间进行 手动同步store</span></span><br><span class="line">      <span class="comment">// Actions might have been dispatched between render and mount - handle those</span></span><br><span class="line">      <span class="keyword">const</span> postMountStoreState = store.getState()</span><br><span class="line">      <span class="keyword">if</span> (postMountStoreState !== <span class="keyword">this</span>.state.storeState) &#123;</span><br><span class="line">        <span class="keyword">this</span>.setState(&#123; <span class="attr">storeState</span>: postMountStoreState &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    render() &#123;</span><br><span class="line">      <span class="keyword">const</span> Context = <span class="keyword">this</span>.props.context || ReactReduxContext</span><br><span class="line">  </span><br><span class="line">      <span class="keyword">return</span> (</span><br><span class="line">        <span class="comment">// 使用Context包裹children</span></span><br><span class="line">        &lt;Context.Provider value=&#123;<span class="keyword">this</span>.state&#125;&gt;</span><br><span class="line">          &#123;<span class="keyword">this</span>.props.children&#125;</span><br><span class="line">        &lt;<span class="regexp">/Context.Provider&gt;</span></span><br><span class="line"><span class="regexp">      )</span></span><br><span class="line"><span class="regexp">    &#125;</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br></pre></td></tr></table></figure>
+<h4 id="src-connect-connect-js"><a href="#src-connect-connect-js" class="headerlink" title="src/connect/connect.js"></a>src/connect/connect.js</h4><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">createConnect</span>(<span class="params">&#123;</span></span></span><br><span class="line"><span class="function"><span class="params">  connectHOC = connectAdvanced,</span></span></span><br><span class="line"><span class="function"><span class="params">  mapStateToPropsFactories = defaultMapStateToPropsFactories,</span></span></span><br><span class="line"><span class="function"><span class="params">  mapDispatchToPropsFactories = defaultMapDispatchToPropsFactories,</span></span></span><br><span class="line"><span class="function"><span class="params">  mergePropsFactories = defaultMergePropsFactories,</span></span></span><br><span class="line"><span class="function"><span class="params">  selectorFactory = defaultSelectorFactory</span></span></span><br><span class="line"><span class="function"><span class="params">&#125; = &#123;&#125;</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 这个connect方法正是我们用到的connect(mapStateToProps, mapDispatchToProps)(WrapperComponent)的真面目</span></span><br><span class="line">  <span class="comment">// mapStateToProps、mapDispatchToProps等参数我就不一一介绍了 请移步官网</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">connect</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">    mapStateToProps,</span></span></span><br><span class="line"><span class="function"><span class="params">    mapDispatchToProps,</span></span></span><br><span class="line"><span class="function"><span class="params">    mergeProps,</span></span></span><br><span class="line"><span class="function"><span class="params">    &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="regexp">//</span> 是否启用PureComponent模式</span></span></span><br><span class="line"><span class="function"><span class="params">      pure = true,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="regexp">//</span> 在调用selectorFactory的时候 为了使用缓存需要调用的比对方法</span></span></span><br><span class="line"><span class="function"><span class="params">      areStatesEqual = strictEqual,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="regexp">//</span> 同上</span></span></span><br><span class="line"><span class="function"><span class="params">      areOwnPropsEqual = shallowEqual,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="regexp">//</span> 同上</span></span></span><br><span class="line"><span class="function"><span class="params">      areStatePropsEqual = shallowEqual,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="regexp">//</span> 同上</span></span></span><br><span class="line"><span class="function"><span class="params">      areMergedPropsEqual = shallowEqual,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="regexp">//</span> 别的参数  getDisplayName<span class="regexp">/methodName/</span>renderCountProp<span class="regexp">/shouldHandleStateChanges等...</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="regexp">      ...extraOptions</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="regexp">    &#125; = &#123;&#125;</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="regexp">  ) &#123;</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="regexp">    /</span>*</span></span></span><br><span class="line"><span class="function"><span class="params">    * wrapper的存在是为了让各种类型的返回值保持一致</span></span></span><br><span class="line"><span class="function"><span class="params">    * 如果mapStateToProps是function类型 return (dispatch, &#123; displayName &#125;</span>) =&gt; <span class="title">proxy</span></span></span><br><span class="line"><span class="function">    * 如果不存在 <span class="title">return</span> (<span class="params">dispatch, option</span>) =&gt; <span class="title">constantSelector</span></span></span><br><span class="line"><span class="function">    * */</span></span><br><span class="line"><span class="function">    // 这三个情况类似 后面就看<span class="title">initMapStateToProps</span>的执行过程就够了</span></span><br><span class="line"><span class="function">    <span class="title">const</span> <span class="title">initMapStateToProps</span> = <span class="title">match</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">      mapStateToProps,</span></span></span><br><span class="line"><span class="function"><span class="params">      mapStateToPropsFactories,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="string">'mapStateToProps'</span></span></span></span><br><span class="line"><span class="function"><span class="params">    </span>)</span></span><br><span class="line"><span class="function">    <span class="title">const</span> <span class="title">initMapDispatchToProps</span> = <span class="title">match</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">      mapDispatchToProps,</span></span></span><br><span class="line"><span class="function"><span class="params">      mapDispatchToPropsFactories,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="string">'mapDispatchToProps'</span></span></span></span><br><span class="line"><span class="function"><span class="params">    </span>)</span></span><br><span class="line"><span class="function">    <span class="title">const</span> <span class="title">initMergeProps</span> = <span class="title">match</span>(<span class="params">mergeProps, mergePropsFactories, <span class="string">'mergeProps'</span></span>)</span></span><br><span class="line"><span class="function">    </span></span><br><span class="line"><span class="function">    // 这个暂时可以看作 <span class="title">return</span> <span class="title">function</span>(<span class="params">WrapperComponent</span>) </span>&#123;&#125;这样一个接收一个组件的方法</span><br><span class="line">    <span class="keyword">return</span> connectHOC(selectorFactory, &#123;</span><br><span class="line">      <span class="comment">// used in error messages</span></span><br><span class="line">      methodName: <span class="string">'connect'</span>,</span><br><span class="line"></span><br><span class="line">      <span class="comment">// used to compute Connect's displayName from the wrapped component's displayName.</span></span><br><span class="line">      getDisplayName: <span class="function"><span class="params">name</span> =&gt;</span> <span class="string">`Connect(<span class="subst">$&#123;name&#125;</span>)`</span>,</span><br><span class="line"></span><br><span class="line">      <span class="comment">// if mapStateToProps is falsy, the Connect component doesn't subscribe to store state changes</span></span><br><span class="line">      shouldHandleStateChanges: <span class="built_in">Boolean</span>(mapStateToProps),</span><br><span class="line"></span><br><span class="line">      <span class="comment">// passed through to selectorFactory</span></span><br><span class="line">      initMapStateToProps,</span><br><span class="line">      initMapDispatchToProps,</span><br><span class="line">      initMergeProps,</span><br><span class="line">      pure,</span><br><span class="line">      areStatesEqual,</span><br><span class="line">      areOwnPropsEqual,</span><br><span class="line">      areStatePropsEqual,</span><br><span class="line">      areMergedPropsEqual,</span><br><span class="line"></span><br><span class="line">      <span class="comment">// any extra options args can override defaults of connect or connectAdvanced</span></span><br><span class="line">      ...extraOptions</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用默认参数返回一个connect高阶函数</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> createConnect()</span><br></pre></td></tr></table></figure>
+<p>这个createConnect方法接收5个参数</p>
+<ol>
+<li>connectHoc 默认值为一个高阶函数</li>
+<li>mapStateToPropsFactories 为用户传入的mapStateToProps值准备的类型映射 每个类型对应不同的执行方法</li>
+<li>mapDispatchToPropsFactories 同上</li>
+<li>mergePropsFactories 同上</li>
+<li>selectorFactory 这个是通过mapStateToProps和mapDispatchToProps获取最终stateProps, dispatchProps并将它们merge到组件props的过程</li>
+</ol>
+<p>match方法<br>match方法会依次执行第二个参数的每个元素 入参为第一个参数 只要有返回值 就return 否则抛出异常<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">match</span>(<span class="params">arg, factories, name</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = factories.length - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">    <span class="keyword">const</span> result = factories[i](arg)</span><br><span class="line">    <span class="comment">// 此时result 的类型是 (dispatch, &#123;&#125;) =&gt; &#123;&#125;</span></span><br><span class="line">    <span class="keyword">if</span> (result) <span class="keyword">return</span> result</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">dispatch, options</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(</span><br><span class="line">      <span class="string">`Invalid value of type <span class="subst">$&#123;<span class="keyword">typeof</span> arg&#125;</span> for <span class="subst">$&#123;name&#125;</span> argument when connecting component <span class="subst">$&#123;</span></span></span><br><span class="line"><span class="string"><span class="subst">        options.wrappedComponentName</span></span></span><br><span class="line"><span class="string"><span class="subst">      &#125;</span>.`</span></span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们看一下initMapStateToProps是怎么产生的<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> initMapStateToProps = match(</span><br><span class="line">  mapStateToProps,</span><br><span class="line">  mapStateToPropsFactories,</span><br><span class="line">  <span class="string">'mapStateToProps'</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>match的第一个参数为用户传入的mapStateToProps 通常是这样的<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> mapStateToProps = <span class="function"><span class="params">state</span> =&gt;</span> (&#123;</span><br><span class="line">  username: state.profile.username,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>第二个参数为mapStateToPropsFactories 默认值为defaultMapStateToPropsFactories 我们看看他是何方神圣</p>
+<h4 id="src-connect-mapStateToProps-js"><a href="#src-connect-mapStateToProps-js" class="headerlink" title="src/connect/mapStateToProps.js"></a>src/connect/mapStateToProps.js</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; wrapMapToPropsConstant, wrapMapToPropsFunc &#125; <span class="keyword">from</span> <span class="string">'./wrapMapToProps'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">whenMapStateToPropsIsFunction</span>(<span class="params">mapStateToProps</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">typeof</span> mapStateToProps === <span class="string">'function'</span></span><br><span class="line">    ? wrapMapToPropsFunc(mapStateToProps, <span class="string">'mapStateToProps'</span>)</span><br><span class="line">    : <span class="literal">undefined</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">whenMapStateToPropsIsMissing</span>(<span class="params">mapStateToProps</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> !mapStateToProps ? wrapMapToPropsConstant(<span class="function"><span class="params">()</span> =&gt;</span> (&#123;&#125;)) : <span class="literal">undefined</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> [whenMapStateToPropsIsFunction, whenMapStateToPropsIsMissing]</span><br></pre></td></tr></table></figure>
+<p>从这个文件可以知道defaultMapStateToPropsFactories就是暴露出来的这个数组<br>上面我们提到过 这个东西是干嘛用的呢 这是个参数类型映射集合<br>从名字可以看出mapStateToProps可以是function 也可以为空</p>
+<p>我们上面举了个function的🌰  先看是function的情况吧<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">whenMapStateToPropsIsFunction</span>(<span class="params">mapStateToProps</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">typeof</span> mapStateToProps === <span class="string">'function'</span></span><br><span class="line">    ? wrapMapToPropsFunc(mapStateToProps, <span class="string">'mapStateToProps'</span>)</span><br><span class="line">    : <span class="literal">undefined</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个方法判断如果mapStateToProps是function类型的就返回wrapMapToPropsFunc(mapStateToProps, ‘mapStateToProps’)的执行结果<br>我们移步看看wrapMapToPropsFunc是何方神圣吧</p>
+<h4 id="src-connect-wrapMapToProps-js"><a href="#src-connect-wrapMapToProps-js" class="headerlink" title="src/connect/wrapMapToProps.js"></a>src/connect/wrapMapToProps.js</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">wrapMapToPropsFunc</span>(<span class="params">mapToProps, methodName</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">initProxySelector</span>(<span class="params">dispatch, &#123; displayName &#125;</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 这里暂时先省略</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第一次看这个代码有点懵逼，这是个啥，又没有什么上下文之类的 这个不用管<br>只需要知道返回的是一个(dispatch, options) =&gt; {} 这样的initProxySelector函数就行了<br>当mapStateToProps传空的时候也是类似这种情况 代码就不贴了 下面我们会回顾这个代码的</p>
+<h4 id="src-components-connectAdvanced-js"><a href="#src-components-connectAdvanced-js" class="headerlink" title="src/components/connectAdvanced.js"></a>src/components/connectAdvanced.js</h4>
           
         
       
@@ -1164,6 +915,268 @@
 &gt; 2. 操作B来了， 取消上一个定时器 设置B的定时器
 </code></pre><p>简单的说就是操作间距少于防抖间隔的时候 使用新的定时器代替旧的 达到只执行后一次操作的作用<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">fn, delay</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timeout</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">...args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> context = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">const</span> cb = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> fn.apply(context, args)</span><br><span class="line">    &#125;</span><br><span class="line">    clearTimeout(timeout)</span><br><span class="line">    timeout = setTimeout(cb, delay)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p>两者都是性能优化的选择，不同的是节流不会打破已设置好的定时器内容 防抖则会使用的新的定时器代替旧的</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/vue生命周期/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/01/vue生命周期/" itemprop="url">vue生命周期</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-01T15:21:35+08:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="vue生命周期-几个钩子函数的区别"><a href="#vue生命周期-几个钩子函数的区别" class="headerlink" title="vue生命周期(几个钩子函数的区别)"></a>vue生命周期(几个钩子函数的区别)</h4><p>先看一张图<br><img src="https://image-static.segmentfault.com/350/409/3504099265-580628fd03258_articlex" alt="vue"></p>
+<ul>
+<li>vue周期的执行顺序如下:<ol>
+<li>beforeCreate<br>字面意思，组件创建之前 已经完成了初始化事件等<br>此时还不能访问到data里的数据 因此不能在这个钩子里执行渲染逻辑(api或者data赋值操作)</li>
+<li>data<br>初始化data的过程</li>
+<li>provide</li>
+<li>created<br>此时已经能够访问data template还没有编译好</li>
+<li>beforeMount<br>已完成模板数据装载 但是还没有$el</li>
+<li>mounted<br>已将模板渲染到节点上 此时才有$el 可以进行dom操作</li>
+<li>beforeUpdate</li>
+<li>updated</li>
+<li>beforeDestroy</li>
+<li>destroyed</li>
+</ol>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/vue-provide-inject/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/01/vue-provide-inject/" itemprop="url">vue-provide/inject</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-01T15:02:07+08:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="provide-inject"><a href="#provide-inject" class="headerlink" title="provide/inject"></a>provide/inject</h3><p>provide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传</p>
+<ul>
+<li>provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例 </li>
+<li>inject接收数组或者属性对象集合</li>
+</ul>
+<h4 id="举个🌰-我们列举三个组件-祖先、父组件、子组件"><a href="#举个🌰-我们列举三个组件-祖先、父组件、子组件" class="headerlink" title="举个🌰 我们列举三个组件  祖先、父组件、子组件"></a>举个🌰 我们列举三个组件  祖先、父组件、子组件</h4><p>grandPa.vue<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  // provide的传递方法可以为对象也可以为函数 通常情况下如果传递的值与当前组件无关 则使用对象形式</span><br><span class="line">  provide() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      grandPa: this,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  provide: &#123;</span><br><span class="line">    grandPa: this,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>father.vue<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  // inject用法和props类似</span><br><span class="line">  inject: [&apos;grandPa&apos;],</span><br><span class="line">  // 也可写成如下方式</span><br><span class="line">  inject: &#123;</span><br><span class="line">    grandPa: &#123;</span><br><span class="line">      type: Object,</span><br><span class="line">      default: () =&gt; (&#123;&#125;),</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="provide的执行时机"><a href="#provide的执行时机" class="headerlink" title="provide的执行时机"></a>provide的执行时机</h4><p>provide的执行时机出于data和created之间</p>
 
           
         
