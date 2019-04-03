@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="vue,">
+  <meta name="keywords" content="react ref 笔记,">
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="provide/injectprovide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传  provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例  inject接收数组或者属性对象集合  举个🌰 我们列举三个组件  祖先、父组件、子组件grandPa.vue12345678910">
-<meta name="keywords" content="vue">
+<meta name="description" content="React之转发refreact.16.3新增了forwardRef Api 用来转发ref到子组件上这里大致说下两种情况  纯组件不能使用ref 如何给使用了高阶函数包裹的组件加上ref  针对以上两种情况 我们看看这个新的api 纯组件纯组件是不需要ref属性的 我们可以使用React.forwardRef将父组件加的ref转发到input里harmony123const ForwardRef">
+<meta name="keywords" content="react ref 笔记">
 <meta property="og:type" content="article">
-<meta property="og:title" content="vue-provide&#x2F;inject">
-<meta property="og:url" content="http://yoursite.com/2018/04/01/vue-provide-inject/index.html">
+<meta property="og:title" content="react之转发ref">
+<meta property="og:url" content="http://yoursite.com/2019/04/02/react之转发ref/index.html">
 <meta property="og:site_name" content="周小e丶的博客">
-<meta property="og:description" content="provide/injectprovide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传  provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例  inject接收数组或者属性对象集合  举个🌰 我们列举三个组件  祖先、父组件、子组件grandPa.vue12345678910">
+<meta property="og:description" content="React之转发refreact.16.3新增了forwardRef Api 用来转发ref到子组件上这里大致说下两种情况  纯组件不能使用ref 如何给使用了高阶函数包裹的组件加上ref  针对以上两种情况 我们看看这个新的api 纯组件纯组件是不需要ref属性的 我们可以使用React.forwardRef将父组件加的ref转发到input里harmony123const ForwardRef">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-02T07:54:19.579Z">
+<meta property="og:updated_time" content="2019-04-03T03:15:17.617Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="vue-provide&#x2F;inject">
-<meta name="twitter:description" content="provide/injectprovide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传  provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例  inject接收数组或者属性对象集合  举个🌰 我们列举三个组件  祖先、父组件、子组件grandPa.vue12345678910">
+<meta name="twitter:title" content="react之转发ref">
+<meta name="twitter:description" content="React之转发refreact.16.3新增了forwardRef Api 用来转发ref到子组件上这里大致说下两种情况  纯组件不能使用ref 如何给使用了高阶函数包裹的组件加上ref  针对以上两种情况 我们看看这个新的api 纯组件纯组件是不需要ref属性的 我们可以使用React.forwardRef将父组件加的ref转发到input里harmony123const ForwardRef">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/04/01/vue-provide-inject/">
+  <link rel="canonical" href="http://yoursite.com/2019/04/02/react之转发ref/">
 
 
 
 
 
-  <title>vue-provide/inject | 周小e丶的博客</title>
+  <title>react之转发ref | 周小e丶的博客</title>
   
 
 
@@ -233,7 +233,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/vue-provide-inject/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/02/react之转发ref/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -250,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">vue-provide/inject</h1>
+          <h1 class="post-title" itemprop="name headline">react之转发ref</h1>
         
 
         <div class="post-meta">
@@ -262,8 +262,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-01T15:02:07+08:00">
-                2018-04-01
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-02T20:19:16+08:00">
+                2019-04-02
               </time>
             
 
@@ -300,14 +300,18 @@
       
 
       
-        <h3 id="provide-inject"><a href="#provide-inject" class="headerlink" title="provide/inject"></a>provide/inject</h3><p>provide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传</p>
-<ul>
-<li>provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例 </li>
-<li>inject接收数组或者属性对象集合</li>
-</ul>
-<h4 id="举个🌰-我们列举三个组件-祖先、父组件、子组件"><a href="#举个🌰-我们列举三个组件-祖先、父组件、子组件" class="headerlink" title="举个🌰 我们列举三个组件  祖先、父组件、子组件"></a>举个🌰 我们列举三个组件  祖先、父组件、子组件</h4><p>grandPa.vue<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  // provide的传递方法可以为对象也可以为函数 通常情况下如果传递的值与当前组件无关 则使用对象形式</span><br><span class="line">  provide() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      grandPa: this,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  provide: &#123;</span><br><span class="line">    grandPa: this,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>father.vue<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  // inject用法和props类似</span><br><span class="line">  inject: [&apos;grandPa&apos;],</span><br><span class="line">  // 也可写成如下方式</span><br><span class="line">  inject: &#123;</span><br><span class="line">    grandPa: &#123;</span><br><span class="line">      type: Object,</span><br><span class="line">      default: () =&gt; (&#123;&#125;),</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h4 id="provide的执行时机"><a href="#provide的执行时机" class="headerlink" title="provide的执行时机"></a>provide的执行时机</h4><p>provide的执行时机出于data和created之间</p>
+        <h4 id="React之转发ref"><a href="#React之转发ref" class="headerlink" title="React之转发ref"></a>React之转发ref</h4><p>react.16.3新增了forwardRef Api 用来转发ref到子组件上<br>这里大致说下两种情况</p>
+<ol>
+<li>纯组件不能使用ref</li>
+<li>如何给使用了高阶函数包裹的组件加上ref</li>
+</ol>
+<p>针对以上两种情况 我们看看这个新的api</p>
+<h5 id="纯组件"><a href="#纯组件" class="headerlink" title="纯组件"></a>纯组件</h5><p>纯组件是不需要ref属性的 我们可以使用React.forwardRef将父组件加的ref转发到input里<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> ForwardRefButton = React.forwardRef(<span class="function">(<span class="params">props, ref</span>) =&gt;</span> (</span><br><span class="line">  &lt;input &#123;...props&#125; ref=&#123;ref&#125; /&gt;</span><br><span class="line">))</span><br></pre></td></tr></table></figure></p>
+<h5 id="高阶组件"><a href="#高阶组件" class="headerlink" title="高阶组件"></a>高阶组件</h5><p>我们先声明一个高阶组件hoc<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hoc</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">WrapperComponent</span>) </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">HOC</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">      render() &#123;</span><br><span class="line">        <span class="keyword">return</span> &lt;div className="hoc-wrapper"&gt;</span><br><span class="line">          &lt;WrapperComponent</span><br><span class="line">            &#123;...this.props&#125;</span><br><span class="line">            ref=&#123;this.props.forwardRef&#125;</span><br><span class="line">          /&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return HOC</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>再写一个正常组件<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ButtonRef</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> &lt;button&gt;测试高阶函数转发ref&lt;/button&gt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> HocButton = hoc()(ButtonRef)</span><br></pre></td></tr></table></figure>
+<p>HocButton 是我们通过高阶组件包装过的组件<br>这时候高阶组件没有进行ref转发 导致我们给HocButton添加ref属性的时候 只能添加到HOC这个组件上<br>想要ButtonRef也拥有这个属性 我们得改一下高阶函数的返回值 如下:<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> React.forwardRef(<span class="function">(<span class="params">props, ref</span>) =&gt;</span> (</span><br><span class="line">  &lt;HOC &#123;...props&#125; forwardRef=&#123;ref&#125; /&gt;</span><br><span class="line">))</span><br></pre></td></tr></table></figure></p>
+<p>这样就能正常访问到被高阶组件包裹的子组件啦</p>
 
       
     </div>
@@ -325,7 +329,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/vue/" rel="tag"># vue</a>
+            <a href="/tags/react-ref-笔记/" rel="tag"># react ref 笔记</a>
           
         </div>
       
@@ -338,8 +342,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/10/实现简单的bind函数-md/" rel="next" title="实现简单的bind函数.md">
-                <i class="fa fa-chevron-left"></i> 实现简单的bind函数.md
+              <a href="/2019/03/22/react-redux源码解读/" rel="next" title="react-redux源码解读">
+                <i class="fa fa-chevron-left"></i> react-redux源码解读
               </a>
             
           </div>
@@ -347,10 +351,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/04/01/vue生命周期/" rel="prev" title="vue生命周期">
-                vue生命周期 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -473,7 +473,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#provide-inject"><span class="nav-number">1.</span> <span class="nav-text">provide/inject</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#举个🌰-我们列举三个组件-祖先、父组件、子组件"><span class="nav-number">1.1.</span> <span class="nav-text">举个🌰 我们列举三个组件  祖先、父组件、子组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#provide的执行时机"><span class="nav-number">1.2.</span> <span class="nav-text">provide的执行时机</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#React之转发ref"><span class="nav-number">1.</span> <span class="nav-text">React之转发ref</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#纯组件"><span class="nav-number">1.1.</span> <span class="nav-text">纯组件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#高阶组件"><span class="nav-number">1.2.</span> <span class="nav-text">高阶组件</span></a></li></ol></li></ol></div>
             
 
           </div>
