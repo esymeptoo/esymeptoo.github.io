@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="vue,">
+  <meta name="keywords" content="docker、node,">
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="provide/injectprovide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传  provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例  inject接收数组或者属性对象集合  举个🌰 我们列举三个组件  祖先、父组件、子组件grandPa.vue12345678910">
-<meta name="keywords" content="vue">
+<meta name="description" content="这次我们整一下docker部署的问题 会涉及到docker、vue、nginx Step One安装docker: 从docker官网下载 https://docs.docker.com/docker-for-mac/安装步骤略过… 安装nginx: docker pull nginx   一顿操作balabala…安装node: docker pull node 使用vue-cli3整一个vue">
+<meta name="keywords" content="docker、node">
 <meta property="og:type" content="article">
-<meta property="og:title" content="vue-provide&#x2F;inject">
-<meta property="og:url" content="http://yoursite.com/2018/04/01/vue-provide-inject/index.html">
+<meta property="og:title" content="docker容器化部署前端项目">
+<meta property="og:url" content="http://yoursite.com/2019/05/06/docker容器化部署前端项目/index.html">
 <meta property="og:site_name" content="周小e丶的博客">
-<meta property="og:description" content="provide/injectprovide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传  provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例  inject接收数组或者属性对象集合  举个🌰 我们列举三个组件  祖先、父组件、子组件grandPa.vue12345678910">
+<meta property="og:description" content="这次我们整一下docker部署的问题 会涉及到docker、vue、nginx Step One安装docker: 从docker官网下载 https://docs.docker.com/docker-for-mac/安装步骤略过… 安装nginx: docker pull nginx   一顿操作balabala…安装node: docker pull node 使用vue-cli3整一个vue">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-02T07:54:19.579Z">
+<meta property="og:updated_time" content="2019-05-06T09:10:42.309Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="vue-provide&#x2F;inject">
-<meta name="twitter:description" content="provide/injectprovide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传  provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例  inject接收数组或者属性对象集合  举个🌰 我们列举三个组件  祖先、父组件、子组件grandPa.vue12345678910">
+<meta name="twitter:title" content="docker容器化部署前端项目">
+<meta name="twitter:description" content="这次我们整一下docker部署的问题 会涉及到docker、vue、nginx Step One安装docker: 从docker官网下载 https://docs.docker.com/docker-for-mac/安装步骤略过… 安装nginx: docker pull nginx   一顿操作balabala…安装node: docker pull node 使用vue-cli3整一个vue">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/04/01/vue-provide-inject/">
+  <link rel="canonical" href="http://yoursite.com/2019/05/06/docker容器化部署前端项目/">
 
 
 
 
 
-  <title>vue-provide/inject | 周小e丶的博客</title>
+  <title>docker容器化部署前端项目 | 周小e丶的博客</title>
   
 
 
@@ -233,7 +233,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/vue-provide-inject/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/06/docker容器化部署前端项目/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -250,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">vue-provide/inject</h1>
+          <h1 class="post-title" itemprop="name headline">docker容器化部署前端项目</h1>
         
 
         <div class="post-meta">
@@ -262,8 +262,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-01T15:02:07+08:00">
-                2018-04-01
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-05-06T14:22:05+08:00">
+                2019-05-06
               </time>
             
 
@@ -300,14 +300,28 @@
       
 
       
-        <h3 id="provide-inject"><a href="#provide-inject" class="headerlink" title="provide/inject"></a>provide/inject</h3><p>provide和inject也是组件之间进行交互的一种策略 类似react的Context Api 祖组件将数据通过provide一层一层往下传</p>
-<ul>
-<li>provide可以接受方法或者属性对象集合 如果是集合 作用域不能指向自身的vue实例 </li>
-<li>inject接收数组或者属性对象集合</li>
-</ul>
-<h4 id="举个🌰-我们列举三个组件-祖先、父组件、子组件"><a href="#举个🌰-我们列举三个组件-祖先、父组件、子组件" class="headerlink" title="举个🌰 我们列举三个组件  祖先、父组件、子组件"></a>举个🌰 我们列举三个组件  祖先、父组件、子组件</h4><p>grandPa.vue<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  // provide的传递方法可以为对象也可以为函数 通常情况下如果传递的值与当前组件无关 则使用对象形式</span><br><span class="line">  provide() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      grandPa: this,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  provide: &#123;</span><br><span class="line">    grandPa: this,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>father.vue<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  // inject用法和props类似</span><br><span class="line">  inject: [&apos;grandPa&apos;],</span><br><span class="line">  // 也可写成如下方式</span><br><span class="line">  inject: &#123;</span><br><span class="line">    grandPa: &#123;</span><br><span class="line">      type: Object,</span><br><span class="line">      default: () =&gt; (&#123;&#125;),</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h4 id="provide的执行时机"><a href="#provide的执行时机" class="headerlink" title="provide的执行时机"></a>provide的执行时机</h4><p>provide的执行时机出于data和created之间</p>
+        <p>这次我们整一下docker部署的问题 会涉及到docker、vue、nginx</p>
+<h4 id="Step-One"><a href="#Step-One" class="headerlink" title="Step One"></a>Step One</h4><p>安装docker: 从docker官网下载 <a href="https://docs.docker.com/docker-for-mac/" target="_blank" rel="noopener">https://docs.docker.com/docker-for-mac/</a><br>安装步骤略过…</p>
+<p>安装nginx: docker pull nginx   一顿操作balabala…<br>安装node: docker pull node</p>
+<p>使用vue-cli3整一个vue项目  直接vue create docker-vue  又是一通balabala… </p>
+<p>整个安装过程比较慢 先普及一下几个基本的docker命令 </p>
+<ol>
+<li>docker images: 查看镜像</li>
+<li>docker ps: 查看容器</li>
+<li>docker exec -it { containerId } /bin/bash: 进入某个容器的命令行</li>
+<li>docker stop { containerId }: 停止某个容器</li>
+<li>docker rm { containerId }: 移除某个容器</li>
+<li>docker rmi { imageId }: 移除某个镜像 </li>
+<li>docker build -t { imageName } .: 生成一个镜像</li>
+<li>docker run -p {容器端口:宿主端口} -d { imageName }: 启动某个容器</li>
+</ol>
+<p>基本用到的命令就是以上几个了</p>
+<h4 id="Step-Two"><a href="#Step-Two" class="headerlink" title="Step Two"></a>Step Two</h4><p>好了 该装的都装好了 我们直接开搞<br>在vue项目立新建Dockerfile文件 写入以下配置<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> node</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span> . /docker-work/docker-vue</span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span> /docker-work/docker-vue</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span> npm install</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span> npm run build</span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> nginx</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span> dist/ /usr/share/nginx/html</span><br></pre></td></tr></table></figure></p>
+<p>解释一下参数<br>FROM 表示使用docker的哪个镜像 可以是本地安装的 也可以是docker镜像库里的<br>COPY 表示将文件从本地拷贝到这个docker镜像对应的工作目录里 可以通过docker exec命令查看到<br>WORKDIR 表示当前的工作目录<br>RUN 需要启动的命令</p>
+<p>一般COPY的操作都是用以拷贝当前项目文件或者覆盖镜像配置 我们也可以覆盖nginx的default.conf配置等</p>
+<p>上面的操作就是将门项目拷贝到docker镜像的目录 通过装好的node 依次执行npm install和npm run build<br>打包完毕后呢再将打包后的dist目录拷贝到当前镜像工作目录的nginx配置静态资源的目录 启动nginx就行了</p>
+<p>流程大概是这样<br>输入 docker build -t docker-vue . 构建镜像<br>构建完毕 docker images查看是否构建成功</p>
+<p>输入 docker run -p 10000:80 -d docker-vue 启动容器 一个小流程就算完成啦</p>
 
       
     </div>
@@ -325,7 +339,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/vue/" rel="tag"># vue</a>
+            <a href="/tags/docker、node/" rel="tag"># docker、node</a>
           
         </div>
       
@@ -338,8 +352,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/10/实现简单的bind函数-md/" rel="next" title="实现简单的bind函数.md">
-                <i class="fa fa-chevron-left"></i> 实现简单的bind函数.md
+              <a href="/2019/04/02/react之转发ref/" rel="next" title="react之转发ref">
+                <i class="fa fa-chevron-left"></i> react之转发ref
               </a>
             
           </div>
@@ -347,10 +361,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/04/01/vue生命周期/" rel="prev" title="vue生命周期">
-                vue生命周期 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -473,7 +483,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#provide-inject"><span class="nav-number">1.</span> <span class="nav-text">provide/inject</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#举个🌰-我们列举三个组件-祖先、父组件、子组件"><span class="nav-number">1.1.</span> <span class="nav-text">举个🌰 我们列举三个组件  祖先、父组件、子组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#provide的执行时机"><span class="nav-number">1.2.</span> <span class="nav-text">provide的执行时机</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-One"><span class="nav-number">1.</span> <span class="nav-text">Step One</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-Two"><span class="nav-number">2.</span> <span class="nav-text">Step Two</span></a></li></ol></div>
             
 
           </div>

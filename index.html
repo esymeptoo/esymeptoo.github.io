@@ -230,6 +230,147 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/06/docker容器化部署前端项目/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/06/docker容器化部署前端项目/" itemprop="url">docker容器化部署前端项目</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-05-06T14:22:05+08:00">
+                2019-05-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>这次我们整一下docker部署的问题 会涉及到docker、vue、nginx</p>
+<h4 id="Step-One"><a href="#Step-One" class="headerlink" title="Step One"></a>Step One</h4><p>安装docker: 从docker官网下载 <a href="https://docs.docker.com/docker-for-mac/" target="_blank" rel="noopener">https://docs.docker.com/docker-for-mac/</a><br>安装步骤略过…</p>
+<p>安装nginx: docker pull nginx   一顿操作balabala…<br>安装node: docker pull node</p>
+<p>使用vue-cli3整一个vue项目  直接vue create docker-vue  又是一通balabala… </p>
+<p>整个安装过程比较慢 先普及一下几个基本的docker命令 </p>
+<ol>
+<li>docker images: 查看镜像</li>
+<li>docker ps: 查看容器</li>
+<li>docker exec -it { containerId } /bin/bash: 进入某个容器的命令行</li>
+<li>docker stop { containerId }: 停止某个容器</li>
+<li>docker rm { containerId }: 移除某个容器</li>
+<li>docker rmi { imageId }: 移除某个镜像 </li>
+<li>docker build -t { imageName } .: 生成一个镜像</li>
+<li>docker run -p {容器端口:宿主端口} -d { imageName }: 启动某个容器</li>
+</ol>
+<p>基本用到的命令就是以上几个了</p>
+<h4 id="Step-Two"><a href="#Step-Two" class="headerlink" title="Step Two"></a>Step Two</h4><p>好了 该装的都装好了 我们直接开搞<br>在vue项目立新建Dockerfile文件 写入以下配置<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> node</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span> . /docker-work/docker-vue</span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span> /docker-work/docker-vue</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span> npm install</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span> npm run build</span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> nginx</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span> dist/ /usr/share/nginx/html</span><br></pre></td></tr></table></figure></p>
+<p>解释一下参数<br>FROM 表示使用docker的哪个镜像 可以是本地安装的 也可以是docker镜像库里的<br>COPY 表示将文件从本地拷贝到这个docker镜像对应的工作目录里 可以通过docker exec命令查看到<br>WORKDIR 表示当前的工作目录<br>RUN 需要启动的命令</p>
+<p>一般COPY的操作都是用以拷贝当前项目文件或者覆盖镜像配置 我们也可以覆盖nginx的default.conf配置等</p>
+<p>上面的操作就是将门项目拷贝到docker镜像的目录 通过装好的node 依次执行npm install和npm run build<br>打包完毕后呢再将打包后的dist目录拷贝到当前镜像工作目录的nginx配置静态资源的目录 启动nginx就行了</p>
+<p>流程大概是这样<br>输入 docker build -t docker-vue . 构建镜像<br>构建完毕 docker images查看是否构建成功</p>
+<p>输入 docker run -p 10000:80 -d docker-vue 启动容器 一个小流程就算完成啦</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/02/react之转发ref/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1525,7 +1666,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1538,7 +1679,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
