@@ -230,6 +230,133 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/05/有关vue中key的使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/07/05/有关vue中key的使用/" itemprop="url">有关vue中key的使用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-07-05T16:04:15+08:00">
+                2019-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="关于key"><a href="#关于key" class="headerlink" title="关于key"></a>关于key</h4><p>上一张讲了vue的patch过程 有一点讲的还是很含糊的 就是key相关的<br>提到key这概念 在vue1.0中它的前身好像是v-track 作用不用说都知道 是为了优化diff操作 那它到底是如何做到这一点的呢<br>我们先看看代码</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (isUndef(oldKeyToIdx)) &#123; oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx); &#125;</span><br><span class="line">idxInOld = isDef(newStartVnode.key)</span><br><span class="line">  ? oldKeyToIdx[newStartVnode.key]</span><br><span class="line">  : findIdxInOld(newStartVnode, oldCh, oldStartIdx, oldEndIdx);</span><br><span class="line"><span class="keyword">if</span> (isUndef(idxInOld)) &#123; <span class="comment">// New element</span></span><br><span class="line">  createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, <span class="literal">false</span>, newCh, newStartIdx);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  vnodeToMove = oldCh[idxInOld];</span><br><span class="line">  <span class="comment">// 为什么不建议使用数组下标作为key 这里会判断出不是相同节点 并且会重新创建一个新节点</span></span><br><span class="line">  <span class="keyword">if</span> (sameVnode(vnodeToMove, newStartVnode)) &#123;</span><br><span class="line">    patchVnode(vnodeToMove, newStartVnode, insertedVnodeQueue, newCh, newStartIdx);</span><br><span class="line">    oldCh[idxInOld] = <span class="literal">undefined</span>;</span><br><span class="line">    canMove &amp;&amp; nodeOps.insertBefore(parentElm, vnodeToMove.elm, oldStartVnode.elm);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// same key but different element. treat as new element</span></span><br><span class="line">    createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, <span class="literal">false</span>, newCh, newStartIdx);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">newStartVnode = newCh[++newStartIdx];</span><br></pre></td></tr></table></figure>
+<p>这段代码是updateChildren方法里的一个if-branch 上一章节有提到这部分 我就不多赘述了<br>这段代码是干嘛的呢 先是通过oldVnodeChildren计算出老的子节点对应的key 每次updateChildren只需要计算一次</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createKeyToOldIdx</span> (<span class="params">children, beginIdx, endIdx</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> i, key;</span><br><span class="line">  <span class="keyword">var</span> map = &#123;&#125;;</span><br><span class="line">  <span class="keyword">for</span> (i = beginIdx; i &lt;= endIdx; ++i) &#123;</span><br><span class="line">    key = children[i].key;</span><br><span class="line">    <span class="keyword">if</span> (isDef(key)) &#123; map[key] = i; &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> map</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>也就是说如果一个节点有key 就把这个key当做map里的key值 把这个节点所处的index 当做value<br>比如一群子节点A, B, C, D key分别是’A’, ‘B’, ‘C’, ‘D’<br>生成的oldKeyToIdx就是<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  A: <span class="string">'A'</span>,</span><br><span class="line">  B: <span class="string">'B'</span>,</span><br><span class="line">  C: <span class="string">'C'</span>,</span><br><span class="line">  D: <span class="string">'D'</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样就算这些子节点的顺序变了 但是key没变 很容易能找到它在oldVnodesChildren中对应的节点 所以这才作为性能优化的一种手段</p>
+<p>那为什么不推荐使用数组下标作为作为key呢<br>我们看看用数组下标作为key的oldKeyToIdx<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="number">0</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="number">1</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="number">2</span>: <span class="number">2</span>,</span><br><span class="line">  <span class="number">3</span>: <span class="number">3</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样如果子节点顺序发生了变化 比如变成了BADC 此时B的key由1变成了0 实际上我们在oldVnodesChildren中找到的是A<br>这时候如果A和B经过sameVnode判断不是同一个节点 会调用createElm创建新节点 那我们岂不是得不偿失啦 这样的key就没有意义了</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/03/vue-patch/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1536,141 +1663,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/vue生命周期/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="周小e丶">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="周小e丶的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/01/vue生命周期/" itemprop="url">vue生命周期</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-01T15:21:35+08:00">
-                2018-04-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="vue生命周期-几个钩子函数的区别"><a href="#vue生命周期-几个钩子函数的区别" class="headerlink" title="vue生命周期(几个钩子函数的区别)"></a>vue生命周期(几个钩子函数的区别)</h4><p>先看一张图<br><img src="https://image-static.segmentfault.com/350/409/3504099265-580628fd03258_articlex" alt="vue"></p>
-<ul>
-<li>vue周期的执行顺序如下:<ol>
-<li>beforeCreate<br>字面意思，组件创建之前 已经完成了初始化事件等<br>此时还不能访问到data里的数据 因此不能在这个钩子里执行渲染逻辑(api或者data赋值操作)</li>
-<li>data<br>初始化data的过程</li>
-<li>provide</li>
-<li>created<br>此时已经能够访问data template还没有编译好</li>
-<li>beforeMount<br>已完成模板数据装载 但是还没有$el</li>
-<li>mounted<br>已将模板渲染到节点上 此时才有$el 可以进行dom操作</li>
-<li>beforeUpdate</li>
-<li>updated</li>
-<li>beforeDestroy</li>
-<li>destroyed</li>
-</ol>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1721,7 +1713,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
