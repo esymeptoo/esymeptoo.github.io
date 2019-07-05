@@ -88,7 +88,7 @@
 <meta property="og:description" content="Virtual Domvue2.0从引入了Virtual dom的概念作为优化dom操作的手段, 下面我们就详细介绍这玩意儿。中所周知， VNode是virtual dom的主要角色， 先看看VNode的组成 VNode123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="https://esymeptoo.github.io/images/diff.png">
-<meta property="og:updated_time" content="2019-07-04T09:28:51.476Z">
+<meta property="og:updated_time" content="2019-07-05T06:53:30.411Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="vue-patch">
 <meta name="twitter:description" content="Virtual Domvue2.0从引入了Virtual dom的概念作为优化dom操作的手段, 下面我们就详细介绍这玩意儿。中所周知， VNode是virtual dom的主要角色， 先看看VNode的组成 VNode123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495">
@@ -360,7 +360,7 @@
 <li>如果oldStartIdx 大于 oldEndIdx 说明newVnodesChildren没有遍历完 执行addVnodes</li>
 <li>如果newStartIdx &gt; newEndIdx 说明oldVnodeChildren没有遍历完 执行removeVnodes</li>
 </ol>
-<p>以上就是整个patch过程</p>
+<p>以上就是整个patch过程， 尤其是updateChildren的逻辑还是很精妙的 通过不断缩减两条边界线去判断有无相同节点 不管是空间复杂度还是时间复杂度都减少了很多</p>
 
       
     </div>

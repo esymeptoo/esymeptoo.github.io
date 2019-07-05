@@ -359,7 +359,7 @@
 <li>如果oldStartIdx 大于 oldEndIdx 说明newVnodesChildren没有遍历完 执行addVnodes</li>
 <li>如果newStartIdx &gt; newEndIdx 说明oldVnodeChildren没有遍历完 执行removeVnodes</li>
 </ol>
-<p>以上就是整个patch过程</p>
+<p>以上就是整个patch过程， 尤其是updateChildren的逻辑还是很精妙的 通过不断缩减两条边界线去判断有无相同节点 不管是空间复杂度还是时间复杂度都减少了很多</p>
 
           
         
