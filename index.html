@@ -230,6 +230,147 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/26/使用gitlab-ci集成前端项目/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/07/26/使用gitlab-ci集成前端项目/" itemprop="url">使用gitlab-ci集成前端项目</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-07-26T11:13:16+08:00">
+                2019-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>这几天正好有空（划水）在研究ci方面的一些基础知识 主要是对着官方文档做参考并加以实践<br>先介绍一下小弟对于gitlab-ci的认知（免责声明）</p>
+<ol>
+<li>开发者通过配置gitlab-ci.yml文件 在每次代码产生push或者有新的tag产生时触发ci脚本</li>
+<li>gitlab-ci集成流程由多个job组成， 每个job跑在不同的gitlab-runner中， 也可以多个job形成依赖关系 这点倒跟docker有类似的地方</li>
+</ol>
+<h4 id="怎么用"><a href="#怎么用" class="headerlink" title="怎么用"></a>怎么用</h4><p><a href="https://docs.gitlab.com/ce/ci/yaml/README.html#tags" target="_blank" rel="noopener">官方文档</a></p>
+<p>文档讲解的很清楚 这里不多赘述了 主要就是几个参数的使用 如下图所示：<br><img src="https://esymeptoo.github.io/images/gitlab-ci1.png" alt="gitlab-ci"></p>
+<p>本次我们以前端项目的自动化为例，做一个简要的介绍<br>我司的前端项目构建时主要有三个阶段 test、build、deploy</p>
+<ol>
+<li>test阶段主要负责做一些单元测试、代码lint检查等</li>
+<li>build阶段负责将代码打包发到CDN 并根据打包文件生成项目配置文件</li>
+<li>deploy阶段负责 从生成的配置文件中获取最新的静态资源地址 并保存到redis中 以便node服务器去获取最近一次的发版内容</li>
+</ol>
+<p>实际情况远比这些上述要复杂的多 但是本次我们讲的是gitlab-ci用法 下面我会举个demo 包教不包会嘿嘿😋<br>如图<br><img src="https://esymeptoo.github.io/images/gitlab-ci-pipeline.png" alt="gitlab-ci"></p>
+<p>这是一个常规项目的ci流程<br>图中将ci分为三个阶段 Test、Build、Deploy 接下来我会依据这三个阶段实践一下</p>
+<p>我们在项目中创建index.js<br>目标是达到能通过不同的分支去构建不同的环境变量从而打印出不同的env名<br>内容如下:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> env = process.env.NODE_ENV</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">`<span class="subst">$&#123;env&#125;</span>, 蔡徐坤`</span>)</span><br></pre></td></tr></table></figure></p>
+<p>在package.json scripts中加入<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"build"</span>: <span class="string">"export NODE_ENV=$CI_ENVIRONMENT_NAME &amp;&amp; node index.js"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>再新建.gitlab-ci.yml文件<br>内容如下:</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">image:</span> <span class="string">xxxx</span>    <span class="string">//</span> <span class="string">通常是docker-node镜像</span></span><br><span class="line"></span><br><span class="line"><span class="attr">stages:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">build</span></span><br><span class="line">  </span><br><span class="line"><span class="attr">build:</span></span><br><span class="line"><span class="attr">  stage:</span> <span class="string">build</span></span><br><span class="line"><span class="attr">  script:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">npm</span> <span class="string">run</span> <span class="string">build</span></span><br><span class="line"><span class="attr">  environment:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">build</span></span><br><span class="line"><span class="attr">  tags:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="number">2</span><span class="string">B</span></span><br><span class="line"><span class="attr">  only:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">master@xxxx</span></span><br></pre></td></tr></table></figure>
+<p>上面的job 会在master分支push代码后触发npm run build命令<br>environment的name参数对应package.json中的$CI_ENVIRONMENT_NAME参数<br>所以我们可以进一步通过ci提供的模板功能来达到不同分支触发不同构建参数的目的</p>
+<p>如下:<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">.build-template:</span> <span class="string">$build-template</span></span><br><span class="line"><span class="attr">  stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="string">script</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">npm</span> <span class="string">run</span> <span class="string">build</span></span><br><span class="line"><span class="attr">  tags:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="number">2</span><span class="string">B</span></span><br><span class="line">    </span><br><span class="line"><span class="attr">build-dev:</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="string">*build-template</span></span><br><span class="line"><span class="attr">  environment:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">alpha</span></span><br><span class="line"><span class="attr">  only:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">dev@xxxx</span>  </span><br><span class="line">    </span><br><span class="line"><span class="attr">build-beta:</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="string">*build-template</span></span><br><span class="line"><span class="attr">  environment:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">beta</span></span><br><span class="line"><span class="attr">  only:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">dev@xxxx</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>gitlab-ci的用法自由度非常高 这种持续集成方案的出现让开发者在部署方面节省了很多成本。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/05/有关vue中key的使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1524,145 +1665,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/13/函数节流和防抖/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="周小e丶">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="周小e丶的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/13/函数节流和防抖/" itemprop="url">函数节流和防抖</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-13T16:12:03+08:00">
-                2018-12-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="函数节流"><a href="#函数节流" class="headerlink" title="函数节流"></a>函数节流</h4><p>节流: 固定时间内只触发第一次操作</p>
-<ul>
-<li><p>举个🌰: </p>
-<blockquote>
-<ol>
-<li>操作A触发, 直接执行A</li>
-<li>来了操作B， 如果B和A的时间间隔大于等于节流间隔，从1开始</li>
-<li>如果B和A的时间间隔小于节流间隔，设置操作B的定时器 此时timeout有值 直到B运行结束 timeout失效</li>
-<li>来了操作C，如果timeout还在 return 如果timeout失效了 从1开始</li>
-</ol>
-</blockquote>
-<p>简单的说就是 节流就是固定时间内只执行第一次的操作 已经设置好的定时器必须执行</p>
-</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">throttle</span> (<span class="params">action, delay</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timeout = <span class="literal">null</span></span><br><span class="line">  <span class="keyword">let</span> lastRun = <span class="number">0</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (timeout) &#123;</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> elapsed = <span class="built_in">Date</span>.now() - lastRun</span><br><span class="line">    <span class="keyword">let</span> context = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">let</span> args = <span class="built_in">arguments</span></span><br><span class="line">    <span class="keyword">let</span> runCallback = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      lastRun = <span class="built_in">Date</span>.now()</span><br><span class="line">      timeout = <span class="literal">false</span></span><br><span class="line">      action.apply(context, args)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (elapsed &gt;= delay) &#123;</span><br><span class="line">      runCallback()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      clearTimeout(timeout)</span><br><span class="line">      timeout = setTimeout(runCallback, delay)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="函数防抖"><a href="#函数防抖" class="headerlink" title="函数防抖"></a>函数防抖</h4><p>防抖：每个固定时间间隔段内执行最后一次</p>
-<pre><code>&gt; 1. 操作A来了， 设置定时器
-&gt; 2. 操作B来了， 取消上一个定时器 设置B的定时器
-</code></pre><p>简单的说就是操作间距少于防抖间隔的时候 使用新的定时器代替旧的 达到只执行后一次操作的作用<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">fn, delay</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timeout</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">...args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> context = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">const</span> cb = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> fn.apply(context, args)</span><br><span class="line">    &#125;</span><br><span class="line">    clearTimeout(timeout)</span><br><span class="line">    timeout = setTimeout(cb, delay)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p>两者都是性能优化的选择，不同的是节流不会打破已设置好的定时器内容 防抖则会使用的新的定时器代替旧的</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1713,7 +1715,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">14</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1726,7 +1728,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
