@@ -559,7 +559,41 @@
       
         
           
-            <h4 id="待续"><a href="#待续" class="headerlink" title="待续"></a>待续</h4>
+            <h4 id="前情提要"><a href="#前情提要" class="headerlink" title="前情提要"></a>前情提要</h4><p>随着项目越来越大，性能问题已经成为了困扰业务发展的重要因素。<br>功能不停地累加后，核心页面已经不堪重负，访问速度愈来愈慢。<br>业务发展、用户体验都非常迫切的需要释放页面的负载，提高页面加载速度。</p>
+<h4 id="目前几种主流异步加载的方式"><a href="#目前几种主流异步加载的方式" class="headerlink" title="目前几种主流异步加载的方式"></a>目前几种主流异步加载的方式</h4><blockquote>
+<p>Webpack2:</p>
+<ol>
+<li>require.ensure(dependencies, callback, chunName) 已废弃但保留 链接<br>ES提案:</li>
+<li>() =&gt; import()<br>Vue:</li>
+<li>component: resolve =&gt; require(‘xxx./vue’, resolve)<br>React:</li>
+<li>react-loadable</li>
+</ol>
+</blockquote>
+<h4 id="希望通过这篇文章能带来以下的帮助"><a href="#希望通过这篇文章能带来以下的帮助" class="headerlink" title="希望通过这篇文章能带来以下的帮助?"></a>希望通过这篇文章能带来以下的帮助?</h4><ol>
+<li>webpack是如何将异步代码插入到页面上的</li>
+<li>如何检测到异步代码已经查到页面上了?</li>
+</ol>
+<h4 id="有关webpack的code-Spliting"><a href="#有关webpack的code-Spliting" class="headerlink" title="有关webpack的code Spliting"></a>有关webpack的code Spliting</h4><p>本章主要是通过一个简单的异步加载的demo解读一下webpack打包后的代码是如何动态加载页面上的</p>
+<blockquote>
+<p>webpack配置相关代码我就不贴了<br>main.js如下:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> asyncAddWrapper = <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">import</span>(<span class="string">'./add'</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> &#123; <span class="attr">default</span>: add &#125; = <span class="keyword">await</span> asyncAddWrapper()</span><br><span class="line">  <span class="built_in">console</span>.log(add(<span class="number">1</span>, <span class="number">0</span>))</span><br><span class="line">&#125;)()</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>打包入口文件就是一个简单的通过es提案import动态引入add.js的内容并且打印计算结果</p>
+<blockquote>
+<p>add.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">add</span> (<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> a + b</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>add.js 默认暴露了一个两个数相加的函数</p>
+<p>ok 我们运行打包命令 得到以下几个打包后的文件</p>
+<ol>
+<li>0.js</li>
+<li>index.html</li>
+<li>main.js</li>
+</ol>
+<p>用过异步组件的同学都知道 像这种0.js/1.js之类的文件都是我们的异步代码 只在需要的时候引入到页面上 从而达到减少首屏资源引入的效果<br>我们看看打包后的main.js是怎么样的 打包后的代码比较难看 我选了重要的片段</p>
+<blockquote>
+<p>main.js<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params">modules</span>) </span>&#123;</span><br><span class="line">  </span><br><span class="line">&#125;)(&#123;</span><br><span class="line">  <span class="string">'./src/main.js'</span>: (<span class="function"><span class="keyword">function</span> (<span class="params">module, exports, __webpack_require__</span>) </span>&#123;</span><br><span class="line">    (<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">      <span class="keyword">const</span> asyncAddWrapper = <span class="function"><span class="params">()</span> =&gt;</span> __webpack_require__.e(<span class="comment">/*! import() */</span> <span class="number">0</span>).then(__webpack_require__.bind(<span class="literal">null</span>, <span class="comment">/*! ./add */</span> <span class="string">"./src/add.js"</span>))</span><br><span class="line">    </span><br><span class="line">      <span class="keyword">const</span> &#123; <span class="attr">default</span>: add &#125; = <span class="keyword">await</span> asyncAddWrapper()</span><br><span class="line">      <span class="built_in">console</span>.log(add(<span class="number">1</span>, <span class="number">0</span>))</span><br><span class="line">    &#125;)()</span><br><span class="line">  &#125;)(),</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>可以看到打包之后的main.js文件就是一个立即执行函数 入参modules是一个对象 key值是入口文件 value是打包之前main.js的内容<br>只不过import被webpack替换成了promise的形式</p>
+
           
         
       
