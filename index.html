@@ -230,6 +230,162 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/25/next-js初探/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/11/25/next-js初探/" itemprop="url">next.js从入门到重新入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-11-25T15:38:35+08:00">
+                2019-11-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="服务器端渲染-SSR"><a href="#服务器端渲染-SSR" class="headerlink" title="服务器端渲染-SSR"></a>服务器端渲染-SSR</h4><p>服务端渲染（SSR: Server Side Rendering）,用户请求服务器，服务器上直接生成 HTML 内容并返回给浏览器。服务器端渲染来，页面的内容是由 Server 端生成的。一般来说，服务器端渲染的页面交互能力有限，如果要实现复杂交互，还是要通过引入 JavaScript 文件来辅助实现。服务器端渲染这个概念，适用于任何后端语言。。</p>
+<h4 id="为什么要使用SSR技术"><a href="#为什么要使用SSR技术" class="headerlink" title="为什么要使用SSR技术"></a>为什么要使用SSR技术</h4><p>CSR 项目的 SEO 能力极弱，在搜索引擎中基本上不可能有好的排名。因为目前大多数搜索引擎主要识别的内容还是 HTML，对 JavaScript 文件内容的识别都还比较弱。如果一个项目的流量入口来自于搜索引擎，这个时候你使用 CSR 进行开发，就非常不合适了</p>
+<p>SSR 的产生，主要就是为了解决上面所说的问题。在 React 中使用 SSR 技术，我们让 React 代码在服务器端先执行一次，使得用户下载的 HTML 已经包含了所有的页面展示内容，这样，页面展示的过程只需要经历一个 HTTP 请求周期，TTFP 时间得到一倍以上的缩减。</p>
+<p>同时，由于 HTML 中已经包含了网页的所有内容，所以网页的 SEO 效果也会变的非常好。之后，我们让 React 代码在客户端再次执行，为 HTML 网页中的内容添加数据及事件的绑定，页面就具备了 React 的各种交互能力。</p>
+<h4 id="来张图先"><a href="#来张图先" class="headerlink" title="来张图先"></a>来张图先</h4><p><img src="https://raw.githubusercontent.com/esymeptoo/next-demo/master/assets/next-detail.png" alt="next"></p>
+<h4 id="安装next-js"><a href="#安装next-js" class="headerlink" title="安装next.js"></a>安装next.js</h4><ol>
+<li>yarn add next react react-dom</li>
+<li>在package.json-scripts添加            <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"dev"</span>: <span class="string">"next"</span>,</span><br><span class="line">  <span class="string">"build"</span>: <span class="string">"next build"</span>,</span><br><span class="line">  <span class="string">"start"</span>: <span class="string">"next start"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h4><ul>
+<li>pages</li>
+<li>public</li>
+<li>node_modules</li>
+<li>.next</li>
+<li>next.config.js</li>
+<li>server.js</li>
+<li>package.json</li>
+</ul>
+<h4 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h4><ol>
+<li>Next.js没有路由配置文件 是通过node文件系统的读取到的路径作为页面的路由 在pages下新增index.js 启动项目就能在localhost:3000下面看到index页</li>
+<li>使用next提供了Link组件和Router进行路由跳转 </li>
+<li>withRouter</li>
+</ol>
+<h4 id="Dynamic-Routing"><a href="#Dynamic-Routing" class="headerlink" title="Dynamic Routing"></a>Dynamic Routing</h4><ol>
+<li>使用query</li>
+<li>不能真正支持params模式</li>
+</ol>
+<h4 id="meta配置"><a href="#meta配置" class="headerlink" title="meta配置"></a>meta配置</h4><p>nuxt.js将页面的head集中到了nuxt.config.js配置文件 next提供了Head组件用于配置页面的meta</p>
+<h4 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h4><ol>
+<li>Built-in CSS support:<style jsx></li>
+<li>CSS-in-JS</li>
+<li>importing css/Sass/Less/Stylus files</li>
+</ol>
+<h4 id="Custom-Api"><a href="#Custom-Api" class="headerlink" title="Custom-Api"></a>Custom-Api</h4><p>pages下的文件目录除了注册页面路由以外 还可以在pages下面新建api文件夹 *.js文件的路径即为请求路径</p>
+<h4 id="Custom-Server"><a href="#Custom-Server" class="headerlink" title="Custom-Server"></a>Custom-Server</h4><p>项目根目录新建server.js</p>
+<h4 id="next-config-js"><a href="#next-config-js" class="headerlink" title="next.config.js"></a>next.config.js</h4><p>设置一些webpack的配置或者next的配置</p>
+</style></li></ol>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/24/浅析webpack异步模块导入原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1490,140 +1646,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/02/react之转发ref/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="周小e丶">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="周小e丶的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/02/react之转发ref/" itemprop="url">react之转发ref</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-02T20:19:16+08:00">
-                2019-04-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="React之转发ref"><a href="#React之转发ref" class="headerlink" title="React之转发ref"></a>React之转发ref</h4><p>react.16.3新增了forwardRef Api 用来转发ref到子组件上<br>这里大致说下两种情况</p>
-<ol>
-<li>纯组件不能使用ref</li>
-<li>如何给使用了高阶函数包裹的组件加上ref</li>
-</ol>
-<p>针对以上两种情况 我们看看这个新的api</p>
-<h5 id="纯组件"><a href="#纯组件" class="headerlink" title="纯组件"></a>纯组件</h5><p>纯组件是不需要ref属性的 我们可以使用React.forwardRef将父组件加的ref转发到input里<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> ForwardRefButton = React.forwardRef(<span class="function">(<span class="params">props, ref</span>) =&gt;</span> (</span><br><span class="line">  &lt;input &#123;...props&#125; ref=&#123;ref&#125; /&gt;</span><br><span class="line">))</span><br></pre></td></tr></table></figure></p>
-<h5 id="高阶组件"><a href="#高阶组件" class="headerlink" title="高阶组件"></a>高阶组件</h5><p>我们先声明一个高阶组件hoc<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hoc</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">WrapperComponent</span>) </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">HOC</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">      render() &#123;</span><br><span class="line">        <span class="keyword">return</span> &lt;div className="hoc-wrapper"&gt;</span><br><span class="line">          &lt;WrapperComponent</span><br><span class="line">            &#123;...this.props&#125;</span><br><span class="line">            ref=&#123;this.props.forwardRef&#125;</span><br><span class="line">          /&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return HOC</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>再写一个正常组件<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ButtonRef</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> &lt;button&gt;测试高阶函数转发ref&lt;/button&gt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> HocButton = hoc()(ButtonRef)</span><br></pre></td></tr></table></figure>
-<p>HocButton 是我们通过高阶组件包装过的组件<br>这时候高阶组件没有进行ref转发 导致我们给HocButton添加ref属性的时候 只能添加到HOC这个组件上<br>想要ButtonRef也拥有这个属性 我们得改一下高阶函数的返回值 如下:<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> React.forwardRef(<span class="function">(<span class="params">props, ref</span>) =&gt;</span> (</span><br><span class="line">  &lt;HOC &#123;...props&#125; forwardRef=&#123;ref&#125; /&gt;</span><br><span class="line">))</span><br></pre></td></tr></table></figure></p>
-<p>这样就能正常访问到被高阶组件包裹的子组件啦</p>
-<p>有没有办法不使用forwardRef就能做到ref转发呢？<br>当然有 可以把ref当做做个属性传进高阶函数 再经由高阶组件注册到子组件上 也能实现ref转发啦 还是上面的例子<br>我们再使用HocButton时<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">handleRef(el) &#123;</span><br><span class="line">  <span class="keyword">this</span>.buttonRef = el</span><br><span class="line">&#125;</span><br><span class="line">render() &#123;</span><br><span class="line">  &lt;HocButton wrappedref=&#123;<span class="keyword">this</span>.handleRef.bind(<span class="keyword">this</span>)&#125; /&gt;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>改一下高阶组件内部调用 如下:<br><figure class="highlight jsx"><figcaption><span>harmony</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hoc</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">WrappedComponent</span>) </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">HOC</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">      render() &#123;</span><br><span class="line">        <span class="keyword">return</span> &lt;div className="hoc-wrapper"&gt;</span><br><span class="line">          &lt;WrappedComponent</span><br><span class="line">            &#123;...this.props&#125;</span><br><span class="line">            ref=&#123;this.props.wrappedref&#125;</span><br><span class="line">          /&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return HOC</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这样也是实现ref转发到WrappedComponent上啦</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1674,7 +1696,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1687,7 +1709,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
