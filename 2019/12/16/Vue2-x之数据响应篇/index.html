@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="vue2.x、Observer、Dep、Watcher,">
 
 
 
@@ -79,14 +79,18 @@
 
 
 
-<meta name="keywords" content="前端、吹比">
-<meta property="og:type" content="website">
-<meta property="og:title" content="周小e丶的博客">
-<meta property="og:url" content="http://yoursite.com/tags/vuex、takeLatest/index.html">
+<meta name="description" content="前言vue-next的推出吸引了大批用户的目光，网上也随之出现了很多介绍原理的篇幅，那是不是就意味着Vue2.x在3的版本出现后就会淡出人们的视野呢？答案是否定的 Vue2.x还是有很多值得我们去学习的地方，本篇主讲Vue2.x版本是如何做数据响应视图的 正文提到Vue的响应原理就不得不说到三个重要人物 分别是Observer、Dep和Watcher这三者各司其职，完成了Vue对于数据和视图的链接">
+<meta name="keywords" content="vue2.x、Observer、Dep、Watcher">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue2.x之数据响应篇">
+<meta property="og:url" content="http://yoursite.com/2019/12/16/Vue2-x之数据响应篇/index.html">
 <meta property="og:site_name" content="周小e丶的博客">
+<meta property="og:description" content="前言vue-next的推出吸引了大批用户的目光，网上也随之出现了很多介绍原理的篇幅，那是不是就意味着Vue2.x在3的版本出现后就会淡出人们的视野呢？答案是否定的 Vue2.x还是有很多值得我们去学习的地方，本篇主讲Vue2.x版本是如何做数据响应视图的 正文提到Vue的响应原理就不得不说到三个重要人物 分别是Observer、Dep和Watcher这三者各司其职，完成了Vue对于数据和视图的链接">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-12-17T07:41:55.515Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="周小e丶的博客">
+<meta name="twitter:title" content="Vue2.x之数据响应篇">
+<meta name="twitter:description" content="前言vue-next的推出吸引了大批用户的目光，网上也随之出现了很多介绍原理的篇幅，那是不是就意味着Vue2.x在3的版本出现后就会淡出人们的视野呢？答案是否定的 Vue2.x还是有很多值得我们去学习的地方，本篇主讲Vue2.x版本是如何做数据响应视图的 正文提到Vue的响应原理就不得不说到三个重要人物 分别是Observer、Dep和Watcher这三者各司其职，完成了Vue对于数据和视图的链接">
 
 
 
@@ -116,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/tags/vuex、takeLatest/">
+  <link rel="canonical" href="http://yoursite.com/2019/12/16/Vue2-x之数据响应篇/">
 
 
 
 
 
-  <title>Tag: vuex、takeLatest | 周小e丶的博客</title>
+  <title>Vue2.x之数据响应篇 | 周小e丶的博客</title>
   
 
 
@@ -141,7 +145,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -215,52 +219,148 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>vuex、takeLatest<small>Tag</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/16/Vue2-x之数据响应篇/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2019/03/19/vuex的takeLatest化/" itemprop="url">
-              
-                <span itemprop="name">vuex的takeLatest化</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">Vue2.x之数据响应篇</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-03-19T13:04:04+08:00" content="2019-03-19">
-          03-19
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-12-16T20:01:22+08:00">
+                2019-12-16
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>vue-next的推出吸引了大批用户的目光，网上也随之出现了很多介绍原理的篇幅，那是不是就意味着Vue2.x在3的版本出现后就会淡出人们的视野呢？<br>答案是否定的 Vue2.x还是有很多值得我们去学习的地方，本篇主讲Vue2.x版本是如何做数据响应视图的</p>
+<h3 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h3><p>提到Vue的响应原理就不得不说到三个重要人物 分别是Observer、Dep和Watcher<br>这三者各司其职，完成了Vue对于数据和视图的链接，通过观察者模式打通了数据驱动视图的桥梁<br>下面我们分别介绍这几个点以及他们所扮演的重要角色吧</p>
 
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/vue2-x、Observer、Dep、Watcher/" rel="tag"># vue2.x、Observer、Dep、Watcher</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/25/next-js初探/" rel="next" title="next.js从入门到重新入门">
+                <i class="fa fa-chevron-left"></i> next.js从入门到重新入门
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -268,6 +368,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -288,8 +392,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -340,6 +453,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正文"><span class="nav-number">2.</span> <span class="nav-text">正文</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -473,6 +602,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
