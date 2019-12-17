@@ -88,7 +88,7 @@
 <meta property="og:description" content="前言vue-next的推出吸引了大批用户的目光，网上也随之出现了很多介绍原理的篇幅，那是不是就意味着Vue2.x在3的版本出现后就会淡出人们的视野呢？答案是否定的 Vue2.x还是有很多值得我们去学习的地方，本篇主讲Vue2.x版本是如何做数据响应视图的 正文提到Vue的响应原理就不得不说到三个重要人物 分别是Observer、Dep和Watcher这三者各司其职，完成了Vue对于数据和视图的链接">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/12/15/16f08537778a4859?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
-<meta property="og:updated_time" content="2019-12-17T09:46:02.747Z">
+<meta property="og:updated_time" content="2019-12-17T11:12:16.338Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vue2.x之数据响应篇">
 <meta name="twitter:description" content="前言vue-next的推出吸引了大批用户的目光，网上也随之出现了很多介绍原理的篇幅，那是不是就意味着Vue2.x在3的版本出现后就会淡出人们的视野呢？答案是否定的 Vue2.x还是有很多值得我们去学习的地方，本篇主讲Vue2.x版本是如何做数据响应视图的 正文提到Vue的响应原理就不得不说到三个重要人物 分别是Observer、Dep和Watcher这三者各司其职，完成了Vue对于数据和视图的链接">
@@ -337,9 +337,9 @@
 <p>实际上在一个vue组件初始化的过程中会有以下几个操作 这里只讲本篇用到的hah</p>
 <h5 id="初始化computed-通过initComputed给每个计算属性生成对应的Watcher"><a href="#初始化computed-通过initComputed给每个计算属性生成对应的Watcher" class="headerlink" title="初始化computed 通过initComputed给每个计算属性生成对应的Watcher"></a>初始化computed 通过initComputed给每个计算属性生成对应的Watcher</h5><blockquote>
 <ol>
-<li>此时expOrFn作为参数传进来是个function 并且isRenderWatcher为false 在构造函数会直接赋值给this.getter</li>
-<li>在get方法中，先把当前的watcher推到targetStack 并且赋值给Dep.target 然后执行getter.call(vm, vm)</li>
-<li>这个getter方法执行内部会触发已经被defineReactive的getter操作</li>
+<li>此时expOrFn作为参数传进来是个function 并且isRenderWatcher为false 在构造函数会直接赋值给this.getter 在需要用到的时候会调用get方法获取到value</li>
+<li>但是这类Watcher有个特点：当计算属性依赖于其他数据时，属性并不会立即重新计算，只有之后其他地方需要读取属性的时候，它才会真正计算，即具备lazy（懒计算）特性</li>
+<li>实际上，在组件初始化的过程中，会把computed的watcher存在vm._computedWatchers里，真正用到的时候才会将依赖存进dep 详情代码请看defineComputed</li>
 </ol>
 </blockquote>
 <h5 id="如果钩子函数watch存在监听-会调用initWatch-gt-createWactehr-gt-vm-watch对每个监听创建对应的watcher"><a href="#如果钩子函数watch存在监听-会调用initWatch-gt-createWactehr-gt-vm-watch对每个监听创建对应的watcher" class="headerlink" title="如果钩子函数watch存在监听 会调用initWatch -&gt; createWactehr -&gt; vm.$watch对每个监听创建对应的watcher"></a>如果钩子函数watch存在监听 会调用initWatch -&gt; createWactehr -&gt; vm.$watch对每个监听创建对应的watcher</h5><blockquote>
