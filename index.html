@@ -329,7 +329,108 @@
 <li>normal-watcher: 在钩子watch里定义的，每个watch都会通过initWatch调用vm.$watch生成一个watcher</li>
 <li>render-watcher: 组件在调用$mount时会实例化一个组件级别的watcher 用于组件内部的更新</li>
 </ol>
-<p>当然执行顺序也是 computed-watcher -&gt; normal-watcher -&gt; render-watcher 这样能保证每次更新时computed的属性是及时的</p>
+<p>当然执行顺序也是 computed-watcher -&gt; normal-watcher -&gt; render-watcher 这样能保证每次更新时computed的属性是及时的<br>看到构造函数最后执行了this.get() 这个方法就是依赖收集的关键 我们会从上面三种watcher的角度分别阐述<br>先看get代码:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Watcher.prototype.get = <span class="function"><span class="keyword">function</span> <span class="title">get</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  pushTarget(<span class="keyword">this</span>);</span><br><span class="line">  <span class="keyword">var</span> value;</span><br><span class="line">  <span class="keyword">var</span> vm = <span class="keyword">this</span>.vm;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    value = <span class="keyword">this</span>.getter.call(vm, vm);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.user) &#123;</span><br><span class="line">      handleError(e, vm, (<span class="string">"getter for watcher \""</span> + (<span class="keyword">this</span>.expression) + <span class="string">"\""</span>));</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">throw</span> e</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="comment">// "touch" every property so they are all tracked as</span></span><br><span class="line">    <span class="comment">// dependencies for deep watching</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.deep) &#123;</span><br><span class="line">      traverse(value);</span><br><span class="line">    &#125;</span><br><span class="line">    popTarget();</span><br><span class="line">    <span class="keyword">this</span>.cleanupDeps();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> value</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>看到pushTarget和popTarget是不是很眼熟，这不就是Dep里提供的两个方法嘛<br>这两个方法的作用就是形成一个闭包 value = this.getter.call(vm, vm)<br>这一步会触发被劫持数据的get钩子 此时Dep.target就是当前的watcher实例<br>所有触发getter的对象都会触发dep.depend() 如下:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">depend () &#123;</span><br><span class="line">  <span class="keyword">if</span> (Dep.target) &#123;</span><br><span class="line">    Dep.target.addDep(<span class="keyword">this</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>进而触发当前watcher的addDep方法:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">addDep (dep) &#123;</span><br><span class="line">  <span class="keyword">const</span> id = dep.id</span><br><span class="line">  <span class="keyword">if</span> (!<span class="keyword">this</span>.newDepIds.has(id)) &#123;</span><br><span class="line">    <span class="keyword">this</span>.newDepIds.add(id)</span><br><span class="line">    <span class="keyword">this</span>.newDeps.push(dep)</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.depIds.has(id)) &#123;</span><br><span class="line">      dep.addSub(<span class="keyword">this</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后在调用dep.addSub将数据依赖到的watcher收集到dep.subs里了，等该数据的setter被触发后再调用dep.notify()通知所有订阅者要更新视图啦</p>
+<p>实际上在一个vue组件初始化的过程中会有以下几个操作 这里只讲本篇用到的hah</p>
+<h5 id="初始化computed-通过initComputed给每个计算属性生成对应的Watcher"><a href="#初始化computed-通过initComputed给每个计算属性生成对应的Watcher" class="headerlink" title="初始化computed 通过initComputed给每个计算属性生成对应的Watcher"></a>初始化computed 通过initComputed给每个计算属性生成对应的Watcher</h5><blockquote>
+<ol>
+<li>此时expOrFn作为参数传进来是个function 并且isRenderWatcher为false 在构造函数会直接赋值给this.getter</li>
+<li>在get方法中，先把当前的watcher推到targetStack 并且赋值给Dep.target 然后执行getter.call(vm, vm)</li>
+<li>这个getter方法执行内部会触发已经被defineReactive的getter操作</li>
+</ol>
+</blockquote>
+<h5 id="如果钩子函数watch存在监听-会调用initWatch-gt-createWactehr-gt-vm-watch对每个监听创建对应的watcher"><a href="#如果钩子函数watch存在监听-会调用initWatch-gt-createWactehr-gt-vm-watch对每个监听创建对应的watcher" class="headerlink" title="如果钩子函数watch存在监听 会调用initWatch -&gt; createWactehr -&gt; vm.$watch对每个监听创建对应的watcher"></a>如果钩子函数watch存在监听 会调用initWatch -&gt; createWactehr -&gt; vm.$watch对每个监听创建对应的watcher</h5><blockquote>
+<ol>
+<li>此时expOrFn是string类型 会执行this.getter = parsePath(expOrFn) parsePath代码如下 这个方法的目的就是通过watch的名字循环的触发数据的getter达到依赖收集的作用</li>
+<li>其他逻辑和computed一致</li>
+</ol>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">parsePath</span> (<span class="params">path: string</span>): <span class="title">any</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (bailRE.test(path)) &#123;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> segments = path.split(<span class="string">'.'</span>)</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">obj</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; segments.length; i++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!obj) <span class="keyword">return</span></span><br><span class="line">      obj = obj[segments[i]]</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> obj</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="组件在真正渲染之前会调用-mount-该步骤的目的是生成vnode-并且给每个组件生成一个render-watcher作为内部更新的方法-代码如下"><a href="#组件在真正渲染之前会调用-mount-该步骤的目的是生成vnode-并且给每个组件生成一个render-watcher作为内部更新的方法-代码如下" class="headerlink" title="组件在真正渲染之前会调用$mount 该步骤的目的是生成vnode 并且给每个组件生成一个render-watcher作为内部更新的方法 代码如下:"></a>组件在真正渲染之前会调用$mount 该步骤的目的是生成vnode 并且给每个组件生成一个render-watcher作为内部更新的方法 代码如下:</h5><blockquote>
+<ol>
+<li>此时expOrFn是一个函数updateComponent 如下</li>
+<li>updateComponent负责组件的编译 编译过程中替换模板内的变量是也会触发变量的getter，从而达到收集依赖的作用，这里牵扯到compile部分，不多讲 抽时间单独介绍</li>
+<li>其他逻辑与上面一致</li>
+</ol>
+</blockquote>
+<pre><code class="js"><span class="function"><span class="keyword">function</span> <span class="title">mountComponent</span> (<span class="params"></span></span>
+<span class="function"><span class="params">    vm,</span></span>
+<span class="function"><span class="params">    el,</span></span>
+<span class="function"><span class="params">    hydrating</span></span>
+<span class="function"><span class="params">  </span>) </span>{
+    vm.$el = el;
+    <span class="keyword">if</span> (!vm.$options.render) {
+      vm.$options.render = createEmptyVNode;
+      {
+        <span class="comment">/* istanbul ignore if */</span>
+        <span class="keyword">if</span> ((vm.$options.template &amp;&amp; vm.$options.template.charAt(<span class="number">0</span>) !== <span class="string">'#'</span>) ||
+          vm.$options.el || el) {
+          warn(
+            <span class="string">'You are using the runtime-only build of Vue where the template '</span> +
+            <span class="string">'compiler is not available. Either pre-compile the templates into '</span> +
+            <span class="string">'render functions, or use the compiler-included build.'</span>,
+            vm
+          );
+        } <span class="keyword">else</span> {
+          warn(
+            <span class="string">'Failed to mount component: template or render function not defined.'</span>,
+            vm
+          );
+        }
+      }
+    }
+    callHook(vm, <span class="string">'beforeMount'</span>);
+
+    <span class="keyword">var</span> updateComponent;
+    <span class="comment">/* istanbul ignore if */</span>
+    <span class="keyword">if</span> (config.performance &amp;&amp; mark) {
+      updateComponent = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>{
+        <span class="keyword">var</span> name = vm._name;
+        <span class="keyword">var</span> id = vm._uid;
+        <span class="keyword">var</span> startTag = <span class="string">"vue-perf-start:"</span> + id;
+        <span class="keyword">var</span> endTag = <span class="string">"vue-perf-end:"</span> + id;
+
+        mark(startTag);
+        <span class="keyword">var</span> vnode = vm._render();
+        mark(endTag);
+        measure((<span class="string">"vue "</span> + name + <span class="string">" render"</span>), startTag, endTag);
+
+        mark(startTag);
+        vm._update(vnode, hydrating);
+        mark(endTag);
+        measure((<span class="string">"vue "</span> + name + <span class="string">" patch"</span>), startTag, endTag);
+      };
+    } <span class="keyword">else</span> {
+      updateComponent = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>{
+        vm._update(vm._render(), hydrating);
+      };
+    }
+
+    <span class="comment">// we set this to vm._watcher inside the watcher's constructor</span>
+    <span class="comment">// since the watcher's initial patch may call $forceUpdate (e.g. inside child</span>
+    <span class="comment">// component's mounted hook), which relies on vm._watcher being already defined</span>
+    <span class="keyword">new</span> Watcher(vm, updateComponent, noop, {
+      before: <span class="function"><span class="keyword">function</span> <span class="title">before</span> (<span class="params"></span>) </span>{
+        <span class="keyword">if</span> (vm._isMounted &amp;&amp; !vm._isDestroyed) {
+          callHook(vm, <span class="string">'beforeUpdate'</span>);
+        }
+      }
+    }, <span class="literal">true</span> <span class="comment">/* isRenderWatcher */</span>);
+    hydrating = <span class="literal">false</span>;
+
+    <span class="comment">// manually mounted instance, call mounted on self</span>
+    <span class="comment">// mounted is called for render-created child components in its inserted hook</span>
+    <span class="keyword">if</span> (vm.$vnode == <span class="literal">null</span>) {
+      vm._isMounted = <span class="literal">true</span>;
+      callHook(vm, <span class="string">'mounted'</span>);
+    }
+    <span class="keyword">return</span> vm
+  }
+</code></pre>
+<h3 id="最后上一张图-帮助理解"><a href="#最后上一张图-帮助理解" class="headerlink" title="最后上一张图 帮助理解"></a>最后上一张图 帮助理解</h3><p><img src="https://user-gold-cdn.xitu.io/2019/12/15/16f08537778a4859?imageView2/0/w/1280/h/960/format/webp/ignore-error/1" alt="reactive"></p>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a href="https://juejin.im/post/5df5d78151882512701d6a6c#heading-18" target="_blank" rel="noopener">Vue 数据响应式原理</a></p>
 
           
         
