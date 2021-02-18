@@ -82,7 +82,7 @@
 <meta name="keywords" content="前端、吹比">
 <meta property="og:type" content="website">
 <meta property="og:title" content="周小e丶的博客">
-<meta property="og:url" content="http://yoursite.com/page/3/index.html">
+<meta property="og:url" content="https://esymeptoo.github.io/page/3/index.html">
 <meta property="og:site_name" content="周小e丶的博客">
 <meta property="og:locale" content="default">
 <meta name="twitter:card" content="summary">
@@ -116,7 +116,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/page/3/">
+  <link rel="canonical" href="https://esymeptoo.github.io/page/3/">
 
 
 
@@ -230,7 +230,297 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/vue生命周期/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2019/01/12/探索vue-lazyload(一)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/12/探索vue-lazyload(一)/" itemprop="url">探索vue-lazyload</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-01-12T13:36:29+08:00">
+                2019-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="有关vue的自定义指令"><a href="#有关vue的自定义指令" class="headerlink" title="有关vue的自定义指令"></a>有关vue的自定义指令</h3><ul>
+<li>生命周期[<a href="https://cn.vuejs.org/v2/guide/custom-directive.html]" target="_blank" rel="noopener">https://cn.vuejs.org/v2/guide/custom-directive.html]</a></li>
+</ul>
+<h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><pre><code>  对页面加载速度影响最大的就是图片，一张普通的图片可以达到几M的大小，
+而代码也许就只有几十KB。当页面图片很多时，页面的加载速度缓慢，
+几S钟内页面没有加载完成，也许会失去很多的用户。
+  所以，对于图片过多的页面，为了加速页面加载速度，所以很多时候我们
+需要将页面内未出现在可视区域内的图片先不做加载， 等到滚动到可视区
+域后再去加载。这样子对于页面加载性能上会有很大的提升，也提高了用户体验。
+</code></pre><h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><pre><code>  页面加载时将img标签中的src属性指向一张默认图片或者指向空并且设置高度，
+然后定义data-src属性指向真实的图片地址。
+  例如: &lt;img src=&quot;default.jpg&quot; data-src=&quot;http://xxxxx.jpg&quot; /&gt;
+  对屏幕滚动事件进行监听，判断哪些图片是暴露在视野里的将图片的src指向
+原来data-src指向的图片地址，就能实现简单的图片懒加载了
+</code></pre><h4 id="vue-lazyload实现"><a href="#vue-lazyload实现" class="headerlink" title="vue-lazyload实现"></a>vue-lazyload实现</h4><ul>
+<li>index.js</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 既然是命令就需要使用加载指令的操作 先看install部分的代码</span></span><br><span class="line"><span class="comment">* 这部分代码声明了一个LazyClass和LazyContainer的实例,然后判断了当前vue的版本</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">const</span> LazyClass = Lazy(Vue)</span><br><span class="line"><span class="keyword">const</span> lazy = <span class="keyword">new</span> LazyClass(options)</span><br><span class="line"><span class="keyword">const</span> lazyContainer = <span class="keyword">new</span> LazyContainer(&#123; lazy &#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> isVue2 = Vue.version.split(<span class="string">'.'</span>)[<span class="number">0</span>] === <span class="string">'2'</span></span><br><span class="line"></span><br><span class="line">Vue.prototype.$Lazyload = lazy</span><br><span class="line">   </span><br><span class="line"><span class="comment">// 允许用户通过组件的方式实现懒加载</span></span><br><span class="line"><span class="keyword">if</span> (options.lazyComponent) &#123;</span><br><span class="line">  Vue.component(<span class="string">'lazy-component'</span>, LazyComponent(lazy))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (options.lazyImage) &#123;</span><br><span class="line">  Vue.component(<span class="string">'lazy-image'</span>, LazyImage(lazy))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>lazy.js</li>
+</ul>
+<h4 id="先看构造函数"><a href="#先看构造函数" class="headerlink" title="先看构造函数"></a>先看构造函数</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">constructor</span> (&#123; preLoad, error, throttleWait, preLoadTop, dispatchEvent, loading, attempt, silent = <span class="literal">true</span>, scale, listenEvents, hasbind, filter, adapter, observer, observerOptions &#125;) &#123;</span><br><span class="line">    <span class="keyword">this</span>.version = <span class="string">'__VUE_LAZYLOAD_VERSION__'</span></span><br><span class="line">    <span class="keyword">this</span>.mode = modeType.event</span><br><span class="line">    <span class="keyword">this</span>.ListenerQueue = []</span><br><span class="line">    <span class="keyword">this</span>.TargetIndex = <span class="number">0</span></span><br><span class="line">    <span class="keyword">this</span>.TargetQueue = []</span><br><span class="line">    <span class="comment">// 初始化实例参数</span></span><br><span class="line">    <span class="keyword">this</span>.options = &#123;</span><br><span class="line">      silent: silent,</span><br><span class="line">      dispatchEvent: !!dispatchEvent,</span><br><span class="line">      throttleWait: throttleWait || <span class="number">200</span>,</span><br><span class="line">      preLoad: preLoad || <span class="number">1.3</span>,</span><br><span class="line">      preLoadTop: preLoadTop || <span class="number">0</span>,</span><br><span class="line">      error: error || DEFAULT_URL,</span><br><span class="line">      loading: loading || DEFAULT_URL,</span><br><span class="line">      attempt: attempt || <span class="number">3</span>,</span><br><span class="line">      scale: scale || getDPR(scale),</span><br><span class="line">      ListenEvents: listenEvents || DEFAULT_EVENTS,</span><br><span class="line">      hasbind: <span class="literal">false</span>,</span><br><span class="line">      supportWebp: supportWebp(),</span><br><span class="line">      filter: filter || &#123;&#125;,</span><br><span class="line">      adapter: adapter || &#123;&#125;,</span><br><span class="line">      observer: !!observer,</span><br><span class="line">      observerOptions: observerOptions || DEFAULT_OBSERVER_OPTIONS</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 注册事件 on、emit、remove、once等</span></span><br><span class="line">    <span class="keyword">this</span>._initEvent()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">this</span>.lazyLoadHandler = throttle(<span class="keyword">this</span>._lazyLoadHandler.bind(<span class="keyword">this</span>), <span class="keyword">this</span>.options.throttleWait)</span><br><span class="line">    <span class="comment">// 设置监测模式 addEventListener/IntersectionObserver Api 这个后面再讲</span></span><br><span class="line">    <span class="keyword">this</span>.setMode(<span class="keyword">this</span>.options.observer ? modeType.observer : modeType.event)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="lazyLoadHandler"><a href="#lazyLoadHandler" class="headerlink" title="_lazyLoadHandler"></a>_lazyLoadHandler</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 这是event模式下触发懒加载的核心功能</span></span><br><span class="line"><span class="comment">* 遍历懒加载节点队列 将已经加载移除 没有加载的先判断是否在视野范围内 在就执行listener.load()进行加载</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">  _lazyLoadHandler () &#123;</span><br><span class="line">      <span class="keyword">const</span> freeList = []</span><br><span class="line">      <span class="keyword">this</span>.ListenerQueue.forEach(<span class="function">(<span class="params">listener, index</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!listener.state.error &amp;&amp; listener.state.loaded) &#123;</span><br><span class="line">          <span class="keyword">return</span> freeList.push(listener)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 判断该节点是否在视野内</span></span><br><span class="line">        <span class="comment">// checkInView是ReactiveListener实例的方法</span></span><br><span class="line">        <span class="comment">// 用于判断元素是否在视野里 这里就不作介绍了</span></span><br><span class="line">        <span class="keyword">const</span> catIn = listener.checkInView()</span><br><span class="line">        <span class="keyword">if</span> (!catIn) <span class="keyword">return</span></span><br><span class="line">        listener.load()</span><br><span class="line">      &#125;)</span><br><span class="line">      freeList.forEach(<span class="function"><span class="params">vm</span> =&gt;</span> remove(<span class="keyword">this</span>.ListenerQueue, vm))</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>那么问题来了，这个listener到底是何方神圣呢?<br>在解释这个问题之前我们先看看setMode做了什么事情 这牵扯到另一个核心代码</p>
+<h4 id="setMode"><a href="#setMode" class="headerlink" title="setMode"></a>setMode</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 这是个初始化事件模式的函数 选择监听父节点的方式</span></span><br><span class="line"><span class="comment">* mode接收两个值  event | observer</span></span><br><span class="line"><span class="comment">* event模式指使用addEventListener方式做监听</span></span><br><span class="line"><span class="comment">* observer模式使用浏览器IntersectionObserver Api做监听事件 前提是浏览器得支持这个Api</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">setMode (mode) &#123;</span><br><span class="line">  <span class="comment">// 兼容操作 如果浏览器不支持IntersectionObserver Api 就使用event模式</span></span><br><span class="line">    <span class="keyword">if</span> (!hasIntersectionObserver &amp;&amp; mode === modeType.observer) &#123;</span><br><span class="line">      mode = modeType.event</span><br><span class="line">    &#125;</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">this</span>.mode = mode <span class="comment">// event or observer</span></span><br><span class="line">        </span><br><span class="line">    <span class="comment">// event模式</span></span><br><span class="line">    <span class="keyword">if</span> (mode === modeType.event) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>._observer) &#123;</span><br><span class="line">        <span class="comment">// 移除已经存在的observer模式的监听事件</span></span><br><span class="line">        <span class="keyword">this</span>.ListenerQueue.forEach(<span class="function"><span class="params">listener</span> =&gt;</span> &#123;</span><br><span class="line">          <span class="keyword">this</span>._observer.unobserve(listener.el)</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="keyword">this</span>._observer = <span class="literal">null</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 重新注册event模式的监听事件</span></span><br><span class="line">      <span class="keyword">this</span>.TargetQueue.forEach(<span class="function"><span class="params">target</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>._initListen(target.el, <span class="literal">true</span>)</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 移除event模式的监听事件</span></span><br><span class="line">      <span class="keyword">this</span>.TargetQueue.forEach(<span class="function"><span class="params">target</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>._initListen(target.el, <span class="literal">false</span>)</span><br><span class="line">      &#125;)</span><br><span class="line">      <span class="comment">// 注册observer模式的监听</span></span><br><span class="line">      <span class="keyword">this</span>._initIntersectionObserver()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="initIntersectionObserver"><a href="#initIntersectionObserver" class="headerlink" title="_initIntersectionObserver"></a>_initIntersectionObserver</h4><p>See: [<a href="http://www.ruanyifeng.com/blog/2016/11/intersectionobserver_api.html]" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2016/11/intersectionobserver_api.html]</a><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 为每个绑定指令并且选择了observer模式的节点绑定状态监听事件 并使用_observerHandler作为监听回调</span></span><br><span class="line"><span class="comment">* 这里涉及到IntersectionObserver Api</span></span><br><span class="line"><span class="comment">* 作者对此api做了浏览器兼容判断 并将isIntersecting这个属性与intersectionRatio做了代理</span></span><br><span class="line"><span class="comment">* 个人猜测isIntersecting更好理解吧</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">_initIntersectionObserver () &#123;</span><br><span class="line">      <span class="keyword">if</span> (!hasIntersectionObserver) <span class="keyword">return</span></span><br><span class="line">      <span class="keyword">this</span>._observer = <span class="keyword">new</span> IntersectionObserver(<span class="keyword">this</span>._observerHandler.bind(<span class="keyword">this</span>), <span class="keyword">this</span>.options.observerOptions)</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.ListenerQueue.length) &#123;</span><br><span class="line">        <span class="keyword">this</span>.ListenerQueue.forEach(<span class="function"><span class="params">listener</span> =&gt;</span> &#123;</span><br><span class="line">          <span class="keyword">this</span>._observer.observe(listener.el)</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* entries表示的是被检测到发生可见性变化的节点 可能会有多个</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">_observerHandler (entries, observer) &#123;</span><br><span class="line">      entries.forEach(<span class="function"><span class="params">entry</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 如果节点在页面存在可见部分</span></span><br><span class="line">        <span class="keyword">if</span> (entry.isIntersecting) &#123;</span><br><span class="line">          <span class="keyword">this</span>.ListenerQueue.forEach(<span class="function"><span class="params">listener</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="comment">// 找到目标节点</span></span><br><span class="line">            <span class="keyword">if</span> (listener.el === entry.target) &#123;</span><br><span class="line">              <span class="comment">// 如果图片已经加载 取消对改节点的监听</span></span><br><span class="line">              <span class="keyword">if</span> (listener.state.loaded) <span class="keyword">return</span> <span class="keyword">this</span>._observer.unobserve(listener.el)</span><br><span class="line">              <span class="comment">// 加载图片</span></span><br><span class="line">              listener.load()</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="下面就看看指令周期内的做了什么-上代码"><a href="#下面就看看指令周期内的做了什么-上代码" class="headerlink" title="下面就看看指令周期内的做了什么? 上代码!!!"></a>下面就看看指令周期内的做了什么? 上代码!!!</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Vue.directive(<span class="string">'lazy'</span>, &#123;</span><br><span class="line">  bind: lazy.add.bind(lazy),</span><br><span class="line">  update: lazy.update.bind(lazy),</span><br><span class="line">  componentUpdated: lazy.lazyLoadHandler.bind(lazy),</span><br><span class="line">  unbind: lazy.remove.bind(lazy)</span><br><span class="line">&#125;)</span><br><span class="line">Vue.directive(<span class="string">'lazy-container'</span>, &#123;</span><br><span class="line">  bind: lazyContainer.bind.bind(lazyContainer),</span><br><span class="line">  componentUpdated: lazyContainer.update.bind(lazyContainer),</span><br><span class="line">  unbind: lazyContainer.unbind.bind(lazyContainer)</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 指令第一次被绑定到节点上触发了bind，我们看看lazy.add</span></span><br></pre></td></tr></table></figure>
+<h4 id="lazy-add"><a href="#lazy-add" class="headerlink" title="lazy.add"></a>lazy.add</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 指令绑定的时候出发的操作</span></span><br><span class="line"><span class="comment">* 先判断该节点时候已经在监听队列 在的话就执行update</span></span><br><span class="line"><span class="comment">* 判断用户是否单独添加了loading和error 没有就是用默认值</span></span><br><span class="line"><span class="comment">* 递归向上寻找带有scroll:auto的父节点 没有就用window</span></span><br><span class="line"><span class="comment">* 声明一个ReactiveListener实例 添加到ListenerQueue</span></span><br><span class="line"><span class="comment">* 为找到的父节点和window分别创建监听事件</span></span><br><span class="line"><span class="comment">* 手动触发使第一批图片加载</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">add (el, binding, vnode) &#123;</span><br><span class="line">    <span class="comment">// 判断该节点的监听是否已经存在 有就执行update操作 update下面会讲到</span></span><br><span class="line">    <span class="keyword">if</span> (some(<span class="keyword">this</span>.ListenerQueue, item =&gt; item.el === el)) &#123;</span><br><span class="line">      <span class="keyword">this</span>.update(el, binding)</span><br><span class="line">      <span class="comment">// 更新后手动执行一次</span></span><br><span class="line">      <span class="keyword">return</span> Vue.nextTick(<span class="keyword">this</span>.lazyLoadHandler)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">let</span> &#123; src, loading, error &#125; = <span class="keyword">this</span>._valueFormatter(binding.value)</span><br><span class="line">        </span><br><span class="line">    Vue.nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      src = getBestSelectionFromSrcset(el, <span class="keyword">this</span>.options.scale) || src</span><br><span class="line">      </span><br><span class="line">      <span class="comment">// 支持observer模式</span></span><br><span class="line">      <span class="keyword">this</span>._observer &amp;&amp; <span class="keyword">this</span>._observer.observe(el)</span><br><span class="line">        </span><br><span class="line">      <span class="keyword">const</span> container = <span class="built_in">Object</span>.keys(binding.modifiers)[<span class="number">0</span>]</span><br><span class="line">      <span class="keyword">let</span> $parent</span><br><span class="line">        </span><br><span class="line">      <span class="keyword">if</span> (container) &#123;</span><br><span class="line">        $parent = vnode.context.$refs[container]</span><br><span class="line">        <span class="comment">// if there is container passed in, try ref first, then fallback to getElementById to support the original usage</span></span><br><span class="line">        $parent = $parent ? $parent.$el || $parent : <span class="built_in">document</span>.getElementById(container)</span><br><span class="line">      &#125;</span><br><span class="line">        </span><br><span class="line">      <span class="keyword">if</span> (!$parent) &#123;</span><br><span class="line">        <span class="comment">// 递归寻找含有scroll: auto的父组件</span></span><br><span class="line">        $parent = scrollParent(el)</span><br><span class="line">      &#125;</span><br><span class="line">        </span><br><span class="line">      <span class="comment">// 为其父组件注册监听事件</span></span><br><span class="line">      <span class="comment">// bindType是指绑定的类型 是用src的形式还是使用background-image的方式</span></span><br><span class="line">      <span class="keyword">const</span> newListener = <span class="keyword">new</span> ReactiveListener(&#123;</span><br><span class="line">        bindType: binding.arg,</span><br><span class="line">        $parent,</span><br><span class="line">        el,</span><br><span class="line">        loading,</span><br><span class="line">        error,</span><br><span class="line">        src,</span><br><span class="line">        elRenderer: <span class="keyword">this</span>._elRenderer.bind(<span class="keyword">this</span>),</span><br><span class="line">        options: <span class="keyword">this</span>.options</span><br><span class="line">      &#125;)</span><br><span class="line">        </span><br><span class="line">      <span class="comment">// ListenerQueue存在所有执行add操作的指令</span></span><br><span class="line">      <span class="keyword">this</span>.ListenerQueue.push(newListener)</span><br><span class="line">        </span><br><span class="line">      <span class="comment">// 添加监听事件</span></span><br><span class="line">      <span class="keyword">if</span> (inBrowser) &#123;</span><br><span class="line">        <span class="keyword">this</span>._addListenerTarget(<span class="built_in">window</span>)</span><br><span class="line">        <span class="keyword">this</span>._addListenerTarget($parent)</span><br><span class="line">      &#125;</span><br><span class="line">        </span><br><span class="line">      <span class="comment">// 为了加载滑动过程中节流中间的图片</span></span><br><span class="line">      <span class="comment">// 手动触发第一屏(未滑动时需要加载的图片)</span></span><br><span class="line">      <span class="keyword">this</span>.lazyLoadHandler()</span><br><span class="line">      <span class="comment">// 这一步不知道是为啥 至今没想明白</span></span><br><span class="line">      Vue.nextTick(<span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">this</span>.lazyLoadHandler())</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="ReactiveListener"><a href="#ReactiveListener" class="headerlink" title="ReactiveListener"></a>ReactiveListener</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 初始化一些参数</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">constructor</span> (&#123; el, src, error, loading, bindType, $parent, options, elRenderer &#125;) &#123;</span><br><span class="line">    <span class="keyword">this</span>.el = el</span><br><span class="line">    <span class="keyword">this</span>.src = src</span><br><span class="line">    <span class="keyword">this</span>.error = error</span><br><span class="line">    <span class="keyword">this</span>.loading = loading</span><br><span class="line">    <span class="keyword">this</span>.bindType = bindType</span><br><span class="line">    <span class="comment">// 图片加载错误重试的次数</span></span><br><span class="line">    <span class="keyword">this</span>.attempt = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.naturalHeight = <span class="number">0</span></span><br><span class="line">    <span class="keyword">this</span>.naturalWidth = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.options = options</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.rect = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.$parent = $parent</span><br><span class="line">    <span class="keyword">this</span>.elRenderer = elRenderer</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">this</span>.performanceData = &#123;</span><br><span class="line">      init: <span class="built_in">Date</span>.now(),</span><br><span class="line">      loadStart: <span class="number">0</span>,</span><br><span class="line">      loadEnd: <span class="number">0</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 自定义过滤事件 这个代码很好理解</span></span><br><span class="line">    <span class="keyword">this</span>.filter()</span><br><span class="line">    <span class="comment">// 给每个listener设置状态 error/loaded/rendered</span></span><br><span class="line">    <span class="keyword">this</span>.initState()</span><br><span class="line">    <span class="comment">// 这里间接调用的是 lazy._elRenderer下面会讲到</span></span><br><span class="line">    <span class="keyword">this</span>.render(<span class="string">'loading'</span>, <span class="literal">false</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="lazy-elRenderer"><a href="#lazy-elRenderer" class="headerlink" title="lazy._elRenderer"></a>lazy._elRenderer</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">_elRenderer (listener, state, cache) &#123;</span><br><span class="line">     <span class="keyword">if</span> (!listener.el) <span class="keyword">return</span></span><br><span class="line">     <span class="keyword">const</span> &#123; el, bindType &#125; = listener</span><br><span class="line">          </span><br><span class="line">     <span class="keyword">let</span> src</span><br><span class="line">     <span class="comment">// 选择当前状态需要加载的图片</span></span><br><span class="line">     <span class="keyword">switch</span> (state) &#123;</span><br><span class="line">       <span class="keyword">case</span> <span class="string">'loading'</span>:</span><br><span class="line">         src = listener.loading</span><br><span class="line">         <span class="keyword">break</span></span><br><span class="line">       <span class="keyword">case</span> <span class="string">'error'</span>:</span><br><span class="line">         src = listener.error</span><br><span class="line">         <span class="keyword">break</span></span><br><span class="line">       <span class="comment">// loaded</span></span><br><span class="line">       <span class="keyword">default</span>:</span><br><span class="line">         src = listener.src</span><br><span class="line">         <span class="keyword">break</span></span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">     <span class="comment">// 通过css还是src展示图片</span></span><br><span class="line">     <span class="keyword">if</span> (bindType) &#123;</span><br><span class="line">       el.style[bindType] = <span class="string">'url("'</span> + src + <span class="string">'")'</span></span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (el.getAttribute(<span class="string">'src'</span>) !== src) &#123;</span><br><span class="line">       el.setAttribute(<span class="string">'src'</span>, src)</span><br><span class="line">     &#125;</span><br><span class="line">          </span><br><span class="line">     <span class="comment">// 这一步是为了给css加个选择器</span></span><br><span class="line">     el.setAttribute(<span class="string">'lazy'</span>, state)</span><br><span class="line">          </span><br><span class="line">     <span class="keyword">this</span>.$emit(state, listener, cache)</span><br><span class="line">     <span class="comment">// 触发adapter事件</span></span><br><span class="line">     <span class="keyword">this</span>.options.adapter[state] &amp;&amp; <span class="keyword">this</span>.options.adapter[state](listener, <span class="keyword">this</span>.options)</span><br><span class="line">          </span><br><span class="line">     <span class="comment">// 触发自定义事件</span></span><br><span class="line">     <span class="keyword">if</span> (<span class="keyword">this</span>.options.dispatchEvent) &#123;</span><br><span class="line">       <span class="keyword">const</span> event = <span class="keyword">new</span> CustomEvent(state, &#123;</span><br><span class="line">         detail: listener</span><br><span class="line">       &#125;)</span><br><span class="line">       el.dispatchEvent(event)</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="lazy-addListenerTarget"><a href="#lazy-addListenerTarget" class="headerlink" title="lazy._addListenerTarget"></a>lazy._addListenerTarget</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 这是给懒加载节点的父节点或者window添加监听事件的函数的方法</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">_addListenerTarget (el) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!el) <span class="keyword">return</span></span><br><span class="line">      <span class="keyword">let</span> target = find(<span class="keyword">this</span>.TargetQueue, target =&gt; target.el === el)</span><br><span class="line">      <span class="keyword">if</span> (!target) &#123;</span><br><span class="line">        <span class="comment">// childrenCount代表该节点下需要懒加载的子节点数</span></span><br><span class="line">        target = &#123;</span><br><span class="line">          el: el,</span><br><span class="line">          id: ++<span class="keyword">this</span>.TargetIndex,</span><br><span class="line">          childrenCount: <span class="number">1</span>,</span><br><span class="line">          listened: <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.mode === modeType.event &amp;&amp; <span class="keyword">this</span>._initListen(target.el, <span class="literal">true</span>)</span><br><span class="line">        <span class="keyword">this</span>.TargetQueue.push(target)</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        target.childrenCount++</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">this</span>.TargetIndex</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p>本章重点主要是在对于Lazy类的解读,作者实现的思路极为巧妙，而且将dom操作的逻辑和状态更新的逻辑拆开，很直观，<br>而且涉及到很多浏览器兼容性的处理考虑的比较全面，还是很值得学习的.</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2018/12/13/函数节流和防抖/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/13/函数节流和防抖/" itemprop="url">函数节流和防抖</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-13T16:12:03+08:00">
+                2018-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="函数节流"><a href="#函数节流" class="headerlink" title="函数节流"></a>函数节流</h4><p>节流: 固定时间内只触发第一次操作</p>
+<ul>
+<li><p>举个🌰: </p>
+<blockquote>
+<ol>
+<li>操作A触发, 直接执行A</li>
+<li>来了操作B， 如果B和A的时间间隔大于等于节流间隔，从1开始</li>
+<li>如果B和A的时间间隔小于节流间隔，设置操作B的定时器 此时timeout有值 直到B运行结束 timeout失效</li>
+<li>来了操作C，如果timeout还在 return 如果timeout失效了 从1开始</li>
+</ol>
+</blockquote>
+<p>简单的说就是 节流就是固定时间内只执行第一次的操作 已经设置好的定时器必须执行</p>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">throttle</span> (<span class="params">action, delay</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timeout = <span class="literal">null</span></span><br><span class="line">  <span class="keyword">let</span> lastRun = <span class="number">0</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (timeout) &#123;</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> elapsed = <span class="built_in">Date</span>.now() - lastRun</span><br><span class="line">    <span class="keyword">let</span> context = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">let</span> args = <span class="built_in">arguments</span></span><br><span class="line">    <span class="keyword">let</span> runCallback = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      lastRun = <span class="built_in">Date</span>.now()</span><br><span class="line">      timeout = <span class="literal">false</span></span><br><span class="line">      action.apply(context, args)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (elapsed &gt;= delay) &#123;</span><br><span class="line">      runCallback()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      clearTimeout(timeout)</span><br><span class="line">      timeout = setTimeout(runCallback, delay)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="函数防抖"><a href="#函数防抖" class="headerlink" title="函数防抖"></a>函数防抖</h4><p>防抖：每个固定时间间隔段内执行最后一次</p>
+<pre><code>&gt; 1. 操作A来了， 设置定时器
+&gt; 2. 操作B来了， 取消上一个定时器 设置B的定时器
+</code></pre><p>简单的说就是操作间距少于防抖间隔的时候 使用新的定时器代替旧的 达到只执行后一次操作的作用<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">fn, delay</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timeout</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">...args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> context = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">const</span> cb = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> fn.apply(context, args)</span><br><span class="line">    &#125;</span><br><span class="line">    clearTimeout(timeout)</span><br><span class="line">    timeout = setTimeout(cb, delay)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p>两者都是性能优化的选择，不同的是节流不会打破已设置好的定时器内容 防抖则会使用的新的定时器代替旧的</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2018/04/01/vue生命周期/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -365,7 +655,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/01/vue-provide-inject/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2018/04/01/vue-provide-inject/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -492,7 +782,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/10/实现简单的bind函数-md/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2018/03/10/实现简单的bind函数-md/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -650,7 +940,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-count">25</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -663,7 +953,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
@@ -700,7 +990,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

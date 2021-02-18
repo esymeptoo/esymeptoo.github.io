@@ -82,7 +82,7 @@
 <meta name="keywords" content="前端、吹比">
 <meta property="og:type" content="website">
 <meta property="og:title" content="周小e丶的博客">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:url" content="https://esymeptoo.github.io/index.html">
 <meta property="og:site_name" content="周小e丶的博客">
 <meta property="og:locale" content="default">
 <meta name="twitter:card" content="summary">
@@ -116,7 +116,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/">
+  <link rel="canonical" href="https://esymeptoo.github.io/">
 
 
 
@@ -230,7 +230,376 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/19/Vue2-x之v-model详解/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2020/12/18/悲观锁-乐观锁/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/12/18/悲观锁-乐观锁/" itemprop="url">悲观锁/乐观锁</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-12-18T14:40:19+08:00">
+                2020-12-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="什么场景需要加锁"><a href="#什么场景需要加锁" class="headerlink" title="什么场景需要加锁"></a>什么场景需要加锁</h4><p>在并发的场景下经常会出现多个请求同时打进服务，导致出现资源抢占的问题，比如库存、匹配的场景。</p>
+<blockquote>
+<p>举个库存的栗子，请求A和请求B同时进行下单操作，导致两个请求在获取库存余量的时候都是原始值，分别进行了库存-1的update操作，<br>但是最后我们会发现，原本库存应该减2，实际上只减了1，这就是并发带来的读写不一致问题，这时候就需要加锁操作。</p>
+</blockquote>
+<h4 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h4><blockquote>
+<p>悲观锁认为任何时候都会有并发的资源抢占，也可以理解为独占锁，所以在加锁期间别的请求会处于等待中并重复请求该锁是否被释放。</p>
+</blockquote>
+<h5 id="实现方案"><a href="#实现方案" class="headerlink" title="实现方案"></a>实现方案</h5><ol>
+<li>直接通过内存加锁 <a href="https://github.com/neosmart/AsyncLock" target="_blank" rel="noopener">asyncLock</a><blockquote>
+<p>这种加锁方式是直接在内存里通过变量控制，将请求的执行回调通过一个key保存在队列(FIFO)里，</p>
+</blockquote>
+</li>
+</ol>
+<p>比如请求A进来：</p>
+<blockquote>
+<ul>
+<li>如果队列为空，将回调A打进队列，并执行回调A，回调A执行完后会检查该队列中是否存在别的任务，如果存在则会循环调用</li>
+<li>如果队列不为空，将回调A打进队列，等待前面的循环调用</li>
+</ul>
+</blockquote>
+<p>直到该队列没有任务了，会通过key删除这个队列</p>
+<p>看个简单的demo<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Queue</span> </span>&#123;</span><br><span class="line">  private pending: boolean = <span class="literal">false</span></span><br><span class="line">  public list: any[] = []</span><br><span class="line"></span><br><span class="line">  setPending(val) &#123;</span><br><span class="line">    <span class="keyword">this</span>.pending = val</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  register(fn) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="keyword">async</span> (resolve, reject) =&gt; &#123;</span><br><span class="line">      <span class="keyword">this</span>.list.push([fn, resolve, reject])</span><br><span class="line">      <span class="keyword">if</span> (!<span class="keyword">this</span>.pending) <span class="keyword">await</span> <span class="keyword">this</span>.execute()</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">async</span> execute() &#123;</span><br><span class="line">    <span class="keyword">this</span>.setPending(<span class="literal">true</span>)</span><br><span class="line">    <span class="keyword">const</span> [fn, resolve, reject] = <span class="keyword">this</span>.list.pop()</span><br><span class="line">    <span class="keyword">await</span> fn(resolve, reject)</span><br><span class="line">    <span class="keyword">this</span>.setPending(<span class="literal">false</span>)</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.list.length) <span class="keyword">await</span> <span class="keyword">this</span>.execute()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> queue = <span class="keyword">new</span> Queue()</span><br><span class="line">router.post(<span class="string">'/xxx'</span>, <span class="keyword">async</span> ctx =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> result = <span class="keyword">await</span> queue.register(<span class="keyword">async</span> (resolve, reject) =&gt; &#123;</span><br><span class="line">    <span class="keyword">await</span> sleep(<span class="number">2000</span>)</span><br><span class="line">    resolve()</span><br><span class="line">  &#125;)</span><br><span class="line">  ctx.status = <span class="number">200</span></span><br><span class="line">  ctx.body = &#123;</span><br><span class="line">    data: result,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这种加锁的方式优点成本比较低，对于并发不高的业务可以使用，但是缺点也很明显</p>
+<ol>
+<li>任务都是串行的，并发多了会造成阻塞</li>
+<li>对于集群服务而言内存是不共享的，多台机器就不能这么玩了</li>
+</ol>
+</blockquote>
+<ol start="2">
+<li>引入redis锁<br>redis加分布式锁方法是通过原子操作实现的，众所周知原子操作是不可分割的，在执行完毕之前不会被任何其它任务或事件中断。<blockquote>
+<p>所以我们在请求A打进来的时候对库存操作的加锁，这样请求B进来会先去读锁是否被释放，等锁释放了再去操作库存，这样就能够避免读写不一样的问题</p>
+</blockquote>
+</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> RedisLock &#123;</span><br><span class="line">  <span class="keyword">private</span> expireTime: <span class="built_in">number</span></span><br><span class="line">  <span class="keyword">private</span> lockTimeout: <span class="built_in">number</span></span><br><span class="line">  <span class="keyword">private</span> expireUnit: <span class="string">'PX'</span> | <span class="string">'EX'</span></span><br><span class="line">  <span class="keyword">private</span> expireMode: <span class="string">'NX'</span> | <span class="string">'XX'</span></span><br><span class="line">  <span class="keyword">private</span> client: <span class="built_in">any</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params">client, options: LockOption = &#123;&#125;</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!client) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'缺少redis客户端'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.expireTime = options.expireTime || <span class="number">2</span> <span class="comment">// 锁的有效期</span></span><br><span class="line">    <span class="keyword">this</span>.lockTimeout = options.lockTimeout || <span class="number">5</span> <span class="comment">// 锁超时时间</span></span><br><span class="line">    <span class="keyword">this</span>.expireUnit = options.expireUnit || <span class="string">'EX'</span></span><br><span class="line">    <span class="keyword">this</span>.expireMode = options.expireMode || <span class="string">'NX'</span></span><br><span class="line">    <span class="keyword">this</span>.client = client</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 加锁</span></span><br><span class="line">  <span class="keyword">async</span> lock(key, val, expire?) &#123;</span><br><span class="line">    <span class="keyword">const</span> self = <span class="keyword">this</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">retry</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="comment">// 加锁</span></span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> result = <span class="keyword">await</span> self.client.set(key, val, self.expireUnit, expire || self.expireTime, self.expireMode)</span><br><span class="line">        <span class="keyword">if</span> (result === <span class="string">'OK'</span>) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">await</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> setTimeout(resolve, <span class="number">200</span>))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> retry()</span><br><span class="line">      &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(e)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)()</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 解锁</span></span><br><span class="line">  <span class="keyword">async</span> unlock(key, val) &#123;</span><br><span class="line">    <span class="keyword">const</span> script = <span class="string">"if redis.call('get',KEYS[1]) == ARGV[1] then"</span> +</span><br><span class="line">      <span class="string">"   return redis.call('del',KEYS[1]) "</span> +</span><br><span class="line">      <span class="string">"else"</span> +</span><br><span class="line">      <span class="string">"   return 0 "</span> +</span><br><span class="line">      <span class="string">"end"</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="keyword">this</span>.client.eval(script, <span class="number">1</span>, key, val)</span><br><span class="line">      <span class="keyword">return</span> result === <span class="number">1</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(e)</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码加锁的时候使用了’NX’，保证锁存在时再有进程进行加锁会执行失败，且解锁过程是需要执行lua脚本进行原子操作<br>如何使用<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> lock = <span class="keyword">new</span> RedisLock(redis)</span><br><span class="line">router.post(<span class="string">'/xxx'</span>, <span class="keyword">async</span> ctx =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> lock.lock(<span class="string">'key'</span>, <span class="string">'val'</span>)</span><br><span class="line">  <span class="keyword">await</span> sleep(xxx)</span><br><span class="line">  <span class="keyword">await</span> lock.unlock(<span class="string">'key'</span>, <span class="string">'val'</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>使用redis分布式锁的好处是redis读取速度快且能在集群中使用，当然并发量高了也能在使用redis加锁的同时做一层redis缓存提升服务性能。</p>
+<h4 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h4><p>乐观锁是一种极其乐观的加锁方式，它认为不会出现资源抢占的情况，常见的策略比如CAS(Compare and Swap)，在执行写操作前我们记录数据的初始值和预期值，<br>更新时check一下初始值和数据库当前的值 如果一样就将预期值更新进去，否则就认为是过期请求，再次尝试。</p>
+<p>乐观锁的使用成本比较高，因为会出现ABA的情况，库存可能被请求B从3修改成2，又从2修改成3，这样A的原始值和预期值是一样的，就需要在表里增加version标记每次更新的版本。 </p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2020/11/23/qiankun微前端初探/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周小e丶">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="周小e丶的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/11/23/qiankun微前端初探/" itemprop="url">qiankun微前端实践</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-11-23T15:01:26+08:00">
+                2020-11-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="什么微前端？"><a href="#什么微前端？" class="headerlink" title="什么微前端？"></a>什么微前端？</h3><p>这几年微前端还是比较火的概念，旨在将后端微服务的理念应用于浏览器端，<br>把Web 应用由单一的单体应用转变为多个小型前端应用聚合为一的应用</p>
+<h3 id="微前端的价值"><a href="#微前端的价值" class="headerlink" title="微前端的价值"></a>微前端的价值</h3><h5 id="场景一"><a href="#场景一" class="headerlink" title="场景一"></a>场景一</h5><p>作为项目管理者，我希望降低单体项目的维护成本(子应用拆分场景/在业务系统聚合的同时降低复杂度)</p>
+<h5 id="场景二"><a href="#场景二" class="headerlink" title="场景二"></a>场景二</h5><p>作为开发，我希望使用在保持老业务代码不动的情况下使用新的技术(子应用技术栈无关/避免全量升级版本)</p>
+<h5 id="场景三"><a href="#场景三" class="headerlink" title="场景三"></a>场景三</h5><p>作为开发，我希望在不同的项目技术环境中复用相同的代码模块以提升开发效率(微前端模块)</p>
+<h3 id="为什么不用iframe"><a href="#为什么不用iframe" class="headerlink" title="为什么不用iframe"></a>为什么不用iframe</h3><ol>
+<li>子项目需要改造，需要提供一组不带导航的功能</li>
+<li>iframe嵌入的显示区大小不容易控制，存在一定局限性</li>
+<li>URL的记录完全无效，页面刷新不能够被记忆，刷新会返回首页</li>
+<li>iframe功能之间的跳转是无效的</li>
+<li>iframe的样式显示、兼容性等都具有局限性</li>
+</ol>
+<h3 id="通过这篇文章你将了解到"><a href="#通过这篇文章你将了解到" class="headerlink" title="通过这篇文章你将了解到"></a>通过这篇文章你将了解到</h3><ol>
+<li>qiankun是怎样运行的</li>
+<li>qiankun沙盒是如何实现的</li>
+<li>qiankun是通过什么方式获取到子应用入口文件的钩子函数的</li>
+</ol>
+<p><a href="https://qiankun.umijs.org/zh/api#registermicroappsapps-lifecycles" target="_blank" rel="noopener">官网文档</a></p>
+<h2 id="qiankun运行机制"><a href="#qiankun运行机制" class="headerlink" title="qiankun运行机制"></a>qiankun运行机制</h2><h3 id="single-spa"><a href="#single-spa" class="headerlink" title="single-spa"></a>single-spa</h3><p><a href="https://github.com/single-spa/single-spa" target="_blank" rel="noopener">不多讲</a></p>
+<h3 id="HTML-Entry"><a href="#HTML-Entry" class="headerlink" title="HTML-Entry"></a>HTML-Entry</h3><p><a href="https://github.com/kuitos/import-html-entry" target="_blank" rel="noopener">import-html-entry</a></p>
+<blockquote>
+<p>qiankun支持通过html直接加载子应用，需要子应用在应用入口处暴露出相应的钩子函数并通过webpack打包成umd格式，<br>qiankun会在执行子应用js代码时通过<a href="#magic">magic</a>获取到子应用的钩子函数并执行。</p>
+</blockquote>
+<blockquote>
+<p>相比于JS-Entry，好处是更加灵活，不需要在主应用声明很多scripts地址，<br>也不需要担心external库的更新问题，坏处是把解析消耗放在用户端</p>
+</blockquote>
+<h3 id="sandbox"><a href="#sandbox" class="headerlink" title="sandbox"></a>sandbox</h3><h4 id="js沙箱"><a href="#js沙箱" class="headerlink" title="js沙箱"></a>js沙箱</h4><h5 id="snapShotSandbox"><a href="#snapShotSandbox" class="headerlink" title="snapShotSandbox"></a>snapShotSandbox</h5><blockquote>
+<p>非proxy沙箱用于兼容不支持proxy的浏览器，原理就是在子应用加载前保存window对象的快照，<br>子应用销毁之后使用快照对比window，获取到子应用加载期间的增量并保存，等子应用再次被加载时重新挂在window上</p>
+</blockquote>
+<h5 id="legacySandbox"><a href="#legacySandbox" class="headerlink" title="legacySandbox"></a>legacySandbox</h5><blockquote>
+<p>基于proxy实现的沙箱，用于单例模式，也是qiankun初代版本的沙箱，该版本由singular字段控制是否使用legacySandbox，2.2版本之后使用设置loose为true<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sandbox: &#123; <span class="attr">loose</span>: <span class="literal">true</span> &#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<ol>
+<li><p>该沙箱通过一个空对象fakeWindow去劫持全局window，重写空对象的set和get，</p>
+<ul>
+<li>1.1 获取fakeWindow某个值触发 get 就从window上取，</li>
+<li>1.2 增加window属性触发set就会记录到addedPropsMapInSandbox，</li>
+<li>1.3 修改window属性触发set，将key和window[key]记录到modifiedPropsOriginalValueMapInSandbox，第二次修改这个属性不会再做记录</li>
+<li>1.4 将变化的数据记录到currentUpdatedPropsValueMap</li>
+<li>1.5 映射到window上以便下次 get 时能拿到已更新的数据</li>
+</ul>
+</li>
+<li><p>子应用卸载时，将增量的数据从window上删除，将修改过的key对应的原数据还原到window上</p>
+</li>
+<li>子应用第二次加载时，通过currentUpdatedPropsValueMap恢复</li>
+</ol>
+<blockquote>
+<p>这种沙箱会影响到全局window，因为会将proxy变化映射到window上，并没有做到真正意义上的js隔离，只适用于单例模式</p>
+</blockquote>
+<h5 id="proxySandbox"><a href="#proxySandbox" class="headerlink" title="proxySandbox"></a>proxySandbox</h5><ol>
+<li>新的proxy沙箱在legacySandbox上进行了改进<ul>
+<li>1.1 先记录window上不可配置的属性(Infinity、NaN、undefined、document、location等)，创建一个空的fakeWindow，浅拷贝这些不可枚举属性的值</li>
+<li>1.2 增加或者修改window属性时触发set将值记录到fakeWindow，如果这个值之前存在，直接赋值，不存在就通过Object.defineProperty创建一个descriptor</li>
+<li>1.3 get操作则会从fakeWindow或者window取</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>新的proxy不会污染全局window，因为一些不可配置的属性已经被复制到fakeWindow上</p>
+</blockquote>
+<h4 id="css沙箱-css隔离"><a href="#css沙箱-css隔离" class="headerlink" title="css沙箱(css隔离)"></a>css沙箱(css隔离)</h4><p>experimentalStyleIsolation开启会让子应用的css添加scope</p>
+<h4 id="dom沙箱-shadowDom"><a href="#dom沙箱-shadowDom" class="headerlink" title="dom沙箱(shadowDom)"></a>dom沙箱(shadowDom)</h4><p>开启strictStyleIsolation可使用shadowDom对子应用进行隔离</p>
+<h3 id="应用通信"><a href="#应用通信" class="headerlink" title="应用通信"></a>应用通信</h3><h4 id="GlobalState"><a href="#GlobalState" class="headerlink" title="GlobalState"></a>GlobalState</h4><blockquote>
+<p>qiankun提供了全局state的功能，子应用可以订阅主应用的全局state，<br>globalState变化检测方法类似redux管理state树的实现，只会检测第一层数据的变化。</p>
+</blockquote>
+<blockquote>
+<p>问题是目前只适用于单例模式，只能同时存在一个订阅者</p>
+</blockquote>
+<h3 id="magic"><a href="#magic" class="headerlink" title="magic"></a>magic</h3><h4 id="qiankun如何在html内容里找到项目的入口文件呢"><a href="#qiankun如何在html内容里找到项目的入口文件呢" class="headerlink" title="qiankun如何在html内容里找到项目的入口文件呢?"></a>qiankun如何在html内容里找到项目的入口文件呢?</h4><blockquote>
+<p>通过import-html-entry解析出所有的script标签 会找出带有 「entry」属性的script标签<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://r.xxx.com/xxx/vendor.xxxx.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://r.xxx.com/xxx/xxx.app.js"</span> <span class="attr">entry</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>以上情况就会知道到xxx.app.js是我们的入口文件，那如果没有设置entry呢？<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://r.xxx.com/xxx/vendor.xxxx.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://r.xxx.com/xxx/xxx.app.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>如果没有设置entry，就会默认取最后一个script标签作为入口文件，这就牵扯到打包的顺序问题了<br><a href="https://stackoverflow.com/questions/45979159/how-to-use-chunkssortmode-in-htmlwebpackplugin-webpack-2" target="_blank" rel="noopener">chunksSortMode</a></p>
+<h4 id="如何获取到子应用的钩子函数呢？"><a href="#如何获取到子应用的钩子函数呢？" class="headerlink" title="如何获取到子应用的钩子函数呢？"></a>如何获取到子应用的钩子函数呢？</h4><blockquote>
+<p>上面我们获取到了子应用entry，import-html-entry采用了<a href="https://github.com/systemjs/systemjs/blob/master/src/extras/global.js" target="_blank" rel="noopener">systemjs</a>加载动态文件的方式，<br>执行入口文件代码前记录window的第一个属性、第二个属性和最后一个属性，执行完再对比这三个属性，如果第一个第二个属性一样但是最后一个属性变化，表示是entry执行的结果，<br>则会将这个属性对应的值作为子应用入口文件export出来的钩子。</p>
+</blockquote>
+<blockquote>
+<p>然鹅这样实现有些漏洞，由于副作用或者浏览器兼容性问题<br><a href="https://github.com/umijs/qiankun/issues/485" target="_blank" rel="noopener">import-html-entry的getGlobalProp实现不合理</a><br><a href="https://github.com/umijs/qiankun/issues/1013" target="_blank" rel="noopener">global遍历顺序变化，导致子应用entry无法找到导出的生命周期函数</a><br>于是乎，qiankun增加了fallback方案，统一子应用注册的name和子应用打包时的libraryName，可在上面方案找不到时进行fallback</p>
+</blockquote>
+<h2 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h2><p><a href="https://qiankun.umijs.org/zh/faq" target="_blank" rel="noopener">常见问题汇总</a></p>
+<h2 id="RFC"><a href="#RFC" class="headerlink" title="RFC"></a>RFC</h2><p><a href="https://github.com/umijs/qiankun/issues/442" target="_blank" rel="noopener">不算完善的RFC</a></p>
+<h2 id="缺陷"><a href="#缺陷" class="headerlink" title="缺陷"></a>缺陷</h2><ol>
+<li>官网文档不是很明确，demo也不是很清晰</li>
+<li>官网文档跟新速度跟不上release发布</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a href="https://zhuanlan.zhihu.com/p/78362028" target="_blank" rel="noopener">qiankun作者讲微前端</a></li>
+<li><a href="https://xiaomi-info.github.io/2020/04/14/fe-microfrontends-practice/" target="_blank" rel="noopener">微前端在小米的实践</a></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2019/12/19/Vue2-x之v-model详解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -303,8 +672,8 @@
           
             <h4 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h4><p>在看本篇之前，你可以看看博主的另两篇文章，有助于对本篇的理解</p>
 <ol>
-<li><a href="https://esymeptoo.github.io/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/" target="_blank" rel="noopener">Vue2.x数据响应篇</a></li>
-<li><a href="https://esymeptoo.github.io/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/" target="_blank" rel="noopener">Vue2.x-Watcher篇</a></li>
+<li><a href="https://esymeptoo.github.io/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/">Vue2.x数据响应篇</a></li>
+<li><a href="https://esymeptoo.github.io/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/">Vue2.x-Watcher篇</a></li>
 </ol>
 <h4 id="v-model"><a href="#v-model" class="headerlink" title="v-model"></a>v-model</h4><p>传送门的两章详细讲述了Vue在处理数据响应的过程，但关于Vue在runtime时期的compile还没梳理，这章我们先从v-model开始吧。<br>v-model是Vue提供给用户做双向绑定的一个指令语法 <a href="https://cn.vuejs.org/v2/api/#v-model" target="_blank" rel="noopener">原文传送门</a><br>官网对于用法讲得很清楚，可以给input、select、checkbox、radio和自定义组件使用v-model指令</p>
 <h4 id="上demo"><a href="#上demo" class="headerlink" title="上demo"></a>上demo</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;root&quot;&gt;</span><br><span class="line">  &lt;input v-model=&quot;input.value&quot; type=&quot;text&quot; /&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;script src=&quot;./vue.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">  new Vue(&#123;</span><br><span class="line">    el: &apos;#root&apos;,</span><br><span class="line">    data() &#123;</span><br><span class="line">      return &#123;</span><br><span class="line">        value: &apos;demo&apos;,</span><br><span class="line">        input: &#123;</span><br><span class="line">          value: &apos;demo&apos;,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
@@ -379,7 +748,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/18/Vue2-x-数据响应Watcher篇详解/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2019/12/18/Vue2-x-数据响应Watcher篇详解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -461,7 +830,7 @@
 <p>重点看initComputed<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> computedWatcherOptions = &#123; <span class="attr">lazy</span>: <span class="literal">true</span> &#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">initComputed</span> (<span class="params">vm, computed</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// $flow-disable-line</span></span><br><span class="line">  <span class="keyword">var</span> watchers = vm._computedWatchers = <span class="built_in">Object</span>.create(<span class="literal">null</span>);</span><br><span class="line">  <span class="comment">// computed properties are just getters during SSR</span></span><br><span class="line">  <span class="keyword">var</span> isSSR = isServerRendering();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> computed) &#123;</span><br><span class="line">    <span class="keyword">var</span> userDef = computed[key];</span><br><span class="line">    <span class="keyword">var</span> getter = <span class="keyword">typeof</span> userDef === <span class="string">'function'</span> ? userDef : userDef.get;</span><br><span class="line">    <span class="keyword">if</span> (process.env.NODE_ENV !== <span class="string">'production'</span> &amp;&amp; getter == <span class="literal">null</span>) &#123;</span><br><span class="line">      warn(</span><br><span class="line">        (<span class="string">"Getter is missing for computed property \""</span> + key + <span class="string">"\"."</span>),</span><br><span class="line">        vm</span><br><span class="line">      );</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (!isSSR) &#123;</span><br><span class="line">      <span class="comment">// create internal watcher for the computed property.</span></span><br><span class="line">      watchers[key] = <span class="keyword">new</span> Watcher(</span><br><span class="line">        vm,</span><br><span class="line">        getter || noop,</span><br><span class="line">        noop,</span><br><span class="line">        computedWatcherOptions</span><br><span class="line">      );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// component-defined computed properties are already defined on the</span></span><br><span class="line">    <span class="comment">// component prototype. We only need to define computed properties defined</span></span><br><span class="line">    <span class="comment">// at instantiation here.</span></span><br><span class="line">    <span class="keyword">if</span> (!(key <span class="keyword">in</span> vm)) &#123;</span><br><span class="line">      defineComputed(vm, key, userDef);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (process.env.NODE_ENV !== <span class="string">'production'</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (key <span class="keyword">in</span> vm.$data) &#123;</span><br><span class="line">        warn((<span class="string">"The computed property \""</span> + key + <span class="string">"\" is already defined in data."</span>), vm);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (vm.$options.props &amp;&amp; key <span class="keyword">in</span> vm.$options.props) &#123;</span><br><span class="line">        warn((<span class="string">"The computed property \""</span> + key + <span class="string">"\" is already defined as a prop."</span>), vm);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>以上代码会遍历computed内的键值对，为每个计算属性声明一个Watcher并将该watcher以键值对的形式存在vm._computedWatchers里，<br>注意lazy传的true，所以在执行构造函数的时候不会执行watcher.get，不会将该watcher收集到经过Observe劫持的数据的<strong>ob</strong>.dep.subs里<br>再看defineComputed这个方法<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> sharedPropertyDefinition = &#123;</span><br><span class="line">  enumerable: <span class="literal">true</span>,</span><br><span class="line">  configurable: <span class="literal">true</span>,</span><br><span class="line">  <span class="keyword">get</span>: noop,</span><br><span class="line">  <span class="keyword">set</span>: noop</span><br><span class="line">&#125;;</span><br><span class="line">function defineComputed (</span><br><span class="line">  target,</span><br><span class="line">  key,</span><br><span class="line">  userDef</span><br><span class="line">) &#123;</span><br><span class="line">  <span class="keyword">var</span> shouldCache = !isServerRendering();</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> userDef === <span class="string">'function'</span>) &#123;</span><br><span class="line">    sharedPropertyDefinition.get = shouldCache</span><br><span class="line">      ? createComputedGetter(key)</span><br><span class="line">      : createGetterInvoker(userDef);</span><br><span class="line">    sharedPropertyDefinition.set = noop;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    sharedPropertyDefinition.get = userDef.get</span><br><span class="line">      ? shouldCache &amp;&amp; userDef.cache !== <span class="literal">false</span></span><br><span class="line">        ? createComputedGetter(key)</span><br><span class="line">        : createGetterInvoker(userDef.get)</span><br><span class="line">      : noop;</span><br><span class="line">    sharedPropertyDefinition.set = userDef.set || noop;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (process.env.NODE_ENV !== <span class="string">'production'</span> &amp;&amp;</span><br><span class="line">      sharedPropertyDefinition.set === noop) &#123;</span><br><span class="line">    sharedPropertyDefinition.set = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      warn(</span><br><span class="line">        (<span class="string">"Computed property \""</span> + key + <span class="string">"\" was assigned to but it has no setter."</span>),</span><br><span class="line">        <span class="keyword">this</span></span><br><span class="line">      );</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">Object</span>.defineProperty(target, key, sharedPropertyDefinition);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>defineComputed主要目的是在组件实例上定义该计算书型的getter和setter，还区分了用户有没有手写set/get，<br>在页面调用这个计算属性的时候会调用createComputedGetter，代码如下:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createComputedGetter</span> (<span class="params">key</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">computedGetter</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> watcher = <span class="keyword">this</span>._computedWatchers &amp;&amp; <span class="keyword">this</span>._computedWatchers[key];</span><br><span class="line">    <span class="keyword">if</span> (watcher) &#123;</span><br><span class="line">      <span class="keyword">if</span> (watcher.dirty) &#123;</span><br><span class="line">        watcher.evaluate();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (Dep.target) &#123;</span><br><span class="line">        watcher.depend();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> watcher.value</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里我们关注watcher.evaluate()，evaluate内部会重新执行watcher.get()进行依赖收集，<br><a href="https://esymeptoo.github.io/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/" target="_blank" rel="noopener">上一章提到过</a>，并且返回最终计算结果</p>
+<p>这里我们关注watcher.evaluate()，evaluate内部会重新执行watcher.get()进行依赖收集，<br><a href="https://esymeptoo.github.io/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/">上一章提到过</a>，并且返回最终计算结果</p>
 <h5 id="normal-watcher"><a href="#normal-watcher" class="headerlink" title="normal-watcher"></a>normal-watcher</h5><p>这类watcher是指watch钩子里声明的观察函数，当然也可以通过在组件mounted手动通过this.$watch()手动去声明，后面我们会讲述这两者的区别<br>看initWatch代码:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">initWatch</span> (<span class="params">vm, watch</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> watch) &#123;</span><br><span class="line">    <span class="keyword">var</span> handler = watch[key];</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(handler)) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; handler.length; i++) &#123;</span><br><span class="line">        createWatcher(vm, key, handler[i]);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      createWatcher(vm, key, handler);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>initWatch会遍历每个watch钩子里的键值对，创建一个Watcher实例，从以上代码可以分析出watcher可以有<a href="https://cn.vuejs.org/v2/api/#watch" target="_blank" rel="noopener">三种声明方式</a><br>createWatcher如下:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createWatcher</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  vm,</span></span></span><br><span class="line"><span class="function"><span class="params">  expOrFn,</span></span></span><br><span class="line"><span class="function"><span class="params">  handler,</span></span></span><br><span class="line"><span class="function"><span class="params">  options</span></span></span><br><span class="line"><span class="function"><span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (isPlainObject(handler)) &#123;</span><br><span class="line">    options = handler;</span><br><span class="line">    handler = handler.handler;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> handler === <span class="string">'string'</span>) &#123;</span><br><span class="line">    handler = vm[handler];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> vm.$watch(expOrFn, handler, options)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>而vm.$watch执行的就是new Watcher的操作了，此类型的watcher实例在执行构造函数的时候就会去调用watcher.get()，这点和computed-watcher不一样哦~</p>
@@ -557,7 +926,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/16/Vue2-x之数据响应篇/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2019/12/16/Vue2-x之数据响应篇/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -760,7 +1129,7 @@
 <h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a href="https://juejin.im/post/5df5d78151882512701d6a6c#heading-18" target="_blank" rel="noopener">Vue 数据响应式原理</a></p>
 <h3 id="其他链接"><a href="#其他链接" class="headerlink" title="其他链接"></a>其他链接</h3><p>看了数据响应这块的你 也可以看看Vue2.x关于patch的解读哦</p>
 <ol>
-<li><a href="https://esymeptoo.github.io/2019/07/03/vue-patch/" target="_blank" rel="noopener">vue-patch</a></li>
+<li><a href="https://esymeptoo.github.io/2019/07/03/vue-patch/">vue-patch</a></li>
 </ol>
 
           
@@ -810,7 +1179,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/25/next-js初探/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2019/11/25/next-js初探/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -966,7 +1335,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/24/浅析webpack异步模块导入原理/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2019/09/24/浅析webpack异步模块导入原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -1149,7 +1518,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/13/分享一次装机体验/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2019/08/13/分享一次装机体验/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -1288,7 +1657,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/09/实践travis-ci/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2019/08/09/实践travis-ci/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -1407,7 +1776,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/26/使用gitlab-ci集成前端项目/">
+    <link itemprop="mainEntityOfPage" href="https://esymeptoo.github.io/2019/07/26/使用gitlab-ci集成前端项目/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="周小e丶">
@@ -1535,311 +1904,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/05/有关vue中key的使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="周小e丶">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="周小e丶的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/07/05/有关vue中key的使用/" itemprop="url">有关vue中key的使用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-07-05T16:04:15+08:00">
-                2019-07-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="关于key"><a href="#关于key" class="headerlink" title="关于key"></a>关于key</h4><p>上一张讲了vue的patch过程 有一点讲的还是很含糊的 就是key相关的<br>提到key这概念 在vue1.0中它的前身好像是v-track 作用不用说都知道 是为了优化diff操作 那它到底是如何做到这一点的呢<br>我们先看看代码</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (isUndef(oldKeyToIdx)) &#123; oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx); &#125;</span><br><span class="line">idxInOld = isDef(newStartVnode.key)</span><br><span class="line">  ? oldKeyToIdx[newStartVnode.key]</span><br><span class="line">  : findIdxInOld(newStartVnode, oldCh, oldStartIdx, oldEndIdx);</span><br><span class="line"><span class="keyword">if</span> (isUndef(idxInOld)) &#123; <span class="comment">// New element</span></span><br><span class="line">  createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, <span class="literal">false</span>, newCh, newStartIdx);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  vnodeToMove = oldCh[idxInOld];</span><br><span class="line">  <span class="comment">// 为什么不建议使用数组下标作为key 这里会判断出不是相同节点 并且会重新创建一个新节点</span></span><br><span class="line">  <span class="keyword">if</span> (sameVnode(vnodeToMove, newStartVnode)) &#123;</span><br><span class="line">    patchVnode(vnodeToMove, newStartVnode, insertedVnodeQueue, newCh, newStartIdx);</span><br><span class="line">    oldCh[idxInOld] = <span class="literal">undefined</span>;</span><br><span class="line">    canMove &amp;&amp; nodeOps.insertBefore(parentElm, vnodeToMove.elm, oldStartVnode.elm);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// same key but different element. treat as new element</span></span><br><span class="line">    createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, <span class="literal">false</span>, newCh, newStartIdx);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">newStartVnode = newCh[++newStartIdx];</span><br></pre></td></tr></table></figure>
-<p>这段代码是updateChildren方法里的一个if-branch 上一章节有提到这部分 我就不多赘述了<br>这段代码是干嘛的呢 先是通过oldVnodeChildren计算出老的子节点对应的key 每次updateChildren只需要计算一次</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createKeyToOldIdx</span> (<span class="params">children, beginIdx, endIdx</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> i, key;</span><br><span class="line">  <span class="keyword">var</span> map = &#123;&#125;;</span><br><span class="line">  <span class="keyword">for</span> (i = beginIdx; i &lt;= endIdx; ++i) &#123;</span><br><span class="line">    key = children[i].key;</span><br><span class="line">    <span class="keyword">if</span> (isDef(key)) &#123; map[key] = i; &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> map</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>也就是说如果一个节点有key 就把这个key当做map里的key值 把这个节点所处的index 当做value<br>比如一群子节点A, B, C, D key分别是’A’, ‘B’, ‘C’, ‘D’<br>生成的oldKeyToIdx就是<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  A: <span class="number">0</span>,</span><br><span class="line">  B: <span class="number">1</span>,</span><br><span class="line">  C: <span class="number">2</span>,</span><br><span class="line">  D: <span class="number">3</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这样就算这些子节点的顺序变了 但是key没变 很容易能找到它在oldVnodesChildren中对应的节点 所以这才作为性能优化的一种手段</p>
-<p>那为什么不推荐使用数组下标作为作为key呢<br>我们看看用数组下标作为key的oldKeyToIdx<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="number">0</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="number">1</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="number">2</span>: <span class="number">2</span>,</span><br><span class="line">  <span class="number">3</span>: <span class="number">3</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这样如果子节点顺序发生了变化 比如变成了BADC 此时B的key由1变成了0 实际上我们在oldVnodesChildren中找到的是A<br>这时候如果A和B经过sameVnode判断不是同一个节点 会调用createElm创建新节点 那我们岂不是得不偿失啦 这样的key就没有意义了</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/03/vue-patch/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="周小e丶">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="周小e丶的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/07/03/vue-patch/" itemprop="url">vue-patch</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-07-03T14:53:02+08:00">
-                2019-07-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="Virtual-Dom"><a href="#Virtual-Dom" class="headerlink" title="Virtual Dom"></a>Virtual Dom</h4><p>vue2.0从引入了Virtual dom的概念作为优化dom操作的手段, 下面我们就详细介绍这玩意儿。<br>中所周知， VNode是virtual dom的主要角色， 先看看VNode的组成</p>
-<h3 id="VNode"><a href="#VNode" class="headerlink" title="VNode"></a>VNode</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> VNode &#123;</span><br><span class="line">  tag: <span class="built_in">string</span> | <span class="built_in">void</span>;</span><br><span class="line">  data: VNodeData | <span class="built_in">void</span>;</span><br><span class="line">  children: ?<span class="built_in">Array</span>&lt;VNode&gt;;</span><br><span class="line">  text: <span class="built_in">string</span> | <span class="built_in">void</span>;</span><br><span class="line">  elm: Node | <span class="built_in">void</span>;</span><br><span class="line">  ns: <span class="built_in">string</span> | <span class="built_in">void</span>;</span><br><span class="line">  context: Component | <span class="built_in">void</span>; <span class="comment">// rendered in this component's scope</span></span><br><span class="line">  key: <span class="built_in">string</span> | <span class="built_in">number</span> | <span class="built_in">void</span>;</span><br><span class="line">  componentOptions: VNodeComponentOptions | <span class="built_in">void</span>;</span><br><span class="line">  componentInstance: Component | <span class="built_in">void</span>; <span class="comment">// component instance</span></span><br><span class="line">  parent: VNode | <span class="built_in">void</span>; <span class="comment">// component placeholder node</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// strictly internal</span></span><br><span class="line">  raw: <span class="built_in">boolean</span>; <span class="comment">// contains raw HTML? (server only)</span></span><br><span class="line">  isStatic: <span class="built_in">boolean</span>; <span class="comment">// hoisted static node</span></span><br><span class="line">  isRootInsert: <span class="built_in">boolean</span>; <span class="comment">// necessary for enter transition check</span></span><br><span class="line">  isComment: <span class="built_in">boolean</span>; <span class="comment">// empty comment placeholder?</span></span><br><span class="line">  isCloned: <span class="built_in">boolean</span>; <span class="comment">// is a cloned node?</span></span><br><span class="line">  isOnce: <span class="built_in">boolean</span>; <span class="comment">// is a v-once node?</span></span><br><span class="line">  asyncFactory: <span class="built_in">Function</span> | <span class="built_in">void</span>; <span class="comment">// async component factory function</span></span><br><span class="line">  asyncMeta: <span class="built_in">Object</span> | <span class="built_in">void</span>;</span><br><span class="line">  isAsyncPlaceholder: <span class="built_in">boolean</span>;</span><br><span class="line">  ssrContext: <span class="built_in">Object</span> | <span class="built_in">void</span>;</span><br><span class="line">  fnContext: Component | <span class="built_in">void</span>; <span class="comment">// real context vm for functional nodes</span></span><br><span class="line">  fnOptions: ?ComponentOptions; <span class="comment">// for SSR caching</span></span><br><span class="line">  devtoolsMeta: ?<span class="built_in">Object</span>; <span class="comment">// used to store functional render context for devtools</span></span><br><span class="line">  fnScopeId: ?<span class="built_in">string</span>; <span class="comment">// functional scope id support</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span> (<span class="params"></span></span><br><span class="line"><span class="params">    tag?: <span class="built_in">string</span>,</span></span><br><span class="line"><span class="params">    data?: VNodeData,</span></span><br><span class="line"><span class="params">    children?: ?<span class="built_in">Array</span>&lt;VNode&gt;,</span></span><br><span class="line"><span class="params">    text?: <span class="built_in">string</span>,</span></span><br><span class="line"><span class="params">    elm?: Node,</span></span><br><span class="line"><span class="params">    context?: Component,</span></span><br><span class="line"><span class="params">    componentOptions?: VNodeComponentOptions,</span></span><br><span class="line"><span class="params">    asyncFactory?: <span class="built_in">Function</span></span></span><br><span class="line"><span class="params">  </span>) &#123;</span><br><span class="line">    <span class="keyword">this</span>.tag = tag</span><br><span class="line">    <span class="keyword">this</span>.data = data</span><br><span class="line">    <span class="keyword">this</span>.children = children</span><br><span class="line">    <span class="keyword">this</span>.text = text</span><br><span class="line">    <span class="keyword">this</span>.elm = elm</span><br><span class="line">    <span class="keyword">this</span>.ns = <span class="literal">undefined</span></span><br><span class="line">    <span class="keyword">this</span>.context = context</span><br><span class="line">    <span class="keyword">this</span>.fnContext = <span class="literal">undefined</span></span><br><span class="line">    <span class="keyword">this</span>.fnOptions = <span class="literal">undefined</span></span><br><span class="line">    <span class="keyword">this</span>.fnScopeId = <span class="literal">undefined</span></span><br><span class="line">    <span class="keyword">this</span>.key = data &amp;&amp; data.key</span><br><span class="line">    <span class="keyword">this</span>.componentOptions = componentOptions</span><br><span class="line">    <span class="keyword">this</span>.componentInstance = <span class="literal">undefined</span></span><br><span class="line">    <span class="keyword">this</span>.parent = <span class="literal">undefined</span></span><br><span class="line">    <span class="keyword">this</span>.raw = <span class="literal">false</span></span><br><span class="line">    <span class="keyword">this</span>.isStatic = <span class="literal">false</span></span><br><span class="line">    <span class="keyword">this</span>.isRootInsert = <span class="literal">true</span></span><br><span class="line">    <span class="keyword">this</span>.isComment = <span class="literal">false</span></span><br><span class="line">    <span class="keyword">this</span>.isCloned = <span class="literal">false</span></span><br><span class="line">    <span class="keyword">this</span>.isOnce = <span class="literal">false</span></span><br><span class="line">    <span class="keyword">this</span>.asyncFactory = asyncFactory</span><br><span class="line">    <span class="keyword">this</span>.asyncMeta = <span class="literal">undefined</span></span><br><span class="line">    <span class="keyword">this</span>.isAsyncPlaceholder = <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// DEPRECATED: alias for componentInstance for backwards compat.</span></span><br><span class="line">  <span class="comment">/* istanbul ignore next */</span></span><br><span class="line">  <span class="keyword">get</span> child (): Component | <span class="built_in">void</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.componentInstance</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>以上是VNode的结构 这比真实dom少了很多属性 所以在通过比对VDom的变化在映射到真实dom的过程中会节省很多性能开销</p>
-<h4 id="Patch之前"><a href="#Patch之前" class="headerlink" title="Patch之前"></a>Patch之前</h4><p>本章主要讲vue在数据更新时是怎样及时的通过对比新旧virtual dom映射到真实dom的~<br>从源码来看， 有三个类极为重要 Observer类、Dep类和Watcher类<br>Observer实例负责给每个需要watch的对象添加getter和setter<br>Watcher实例则负责在数据变动的时候去收集依赖、触发patch等操作<br>而Dep实例则是observer和watch的桥梁 在数据变动的时候通知对应watcher执行更新操作</p>
-<h4 id="那么在数据更新的过程中都发生了什么？"><a href="#那么在数据更新的过程中都发生了什么？" class="headerlink" title="那么在数据更新的过程中都发生了什么？"></a>那么在数据更新的过程中都发生了什么？</h4><p>observer.get -&gt; dep.notify -&gt; watcher.update -&gt; flushSchedulerQueue -&gt;<br>watcher.run -&gt; watch.get -&gt; updateComponent -&gt; _render -&gt; _update -&gt; patch<br>-&gt; patchVnode -&gt; updateChildren</p>
-<p>本章主要从patch的过程开始讲</p>
-<h4 id="Patch"><a href="#Patch" class="headerlink" title="Patch"></a>Patch</h4><p><img src="https://esymeptoo.github.io/images/diff.png" alt="diff"></p>
-<p>patch的代码<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">patch</span> (<span class="params">oldVnode, vnode, hydrating, removeOnly</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (isUndef(vnode)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (isDef(oldVnode)) &#123; invokeDestroyHook(oldVnode); &#125;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> isInitialPatch = <span class="literal">false</span>;</span><br><span class="line">  <span class="keyword">var</span> insertedVnodeQueue = [];</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (isUndef(oldVnode)) &#123;</span><br><span class="line">    <span class="comment">// empty mount (likely as component), create new root element</span></span><br><span class="line">    isInitialPatch = <span class="literal">true</span>;</span><br><span class="line">    createElm(vnode, insertedVnodeQueue);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> isRealElement = isDef(oldVnode.nodeType);</span><br><span class="line">    <span class="keyword">if</span> (!isRealElement &amp;&amp; sameVnode(oldVnode, vnode)) &#123;</span><br><span class="line">      <span class="comment">// patch existing root node</span></span><br><span class="line">      patchVnode(oldVnode, vnode, insertedVnodeQueue, <span class="literal">null</span>, <span class="literal">null</span>, removeOnly);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (isRealElement) &#123;</span><br><span class="line">        <span class="comment">// mounting to a real element</span></span><br><span class="line">        <span class="comment">// check if this is server-rendered content and if we can perform</span></span><br><span class="line">        <span class="comment">// a successful hydration.</span></span><br><span class="line">        <span class="keyword">if</span> (oldVnode.nodeType === <span class="number">1</span> &amp;&amp; oldVnode.hasAttribute(SSR_ATTR)) &#123;</span><br><span class="line">          oldVnode.removeAttribute(SSR_ATTR);</span><br><span class="line">          hydrating = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (isTrue(hydrating)) &#123;</span><br><span class="line">          <span class="keyword">if</span> (hydrate(oldVnode, vnode, insertedVnodeQueue)) &#123;</span><br><span class="line">            invokeInsertHook(vnode, insertedVnodeQueue, <span class="literal">true</span>);</span><br><span class="line">            <span class="keyword">return</span> oldVnode</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            warn(</span><br><span class="line">              <span class="string">'The client-side rendered virtual DOM tree is not matching '</span> +</span><br><span class="line">              <span class="string">'server-rendered content. This is likely caused by incorrect '</span> +</span><br><span class="line">              <span class="string">'HTML markup, for example nesting block-level elements inside '</span> +</span><br><span class="line">              <span class="string">'&lt;p&gt;, or missing &lt;tbody&gt;. Bailing hydration and performing '</span> +</span><br><span class="line">              <span class="string">'full client-side render.'</span></span><br><span class="line">            );</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// either not server-rendered, or hydration failed.</span></span><br><span class="line">        <span class="comment">// create an empty node and replace it</span></span><br><span class="line">        oldVnode = emptyNodeAt(oldVnode);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// replacing existing element</span></span><br><span class="line">      <span class="keyword">var</span> oldElm = oldVnode.elm;</span><br><span class="line">      <span class="keyword">var</span> parentElm = nodeOps.parentNode(oldElm);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// create new node</span></span><br><span class="line">      createElm(</span><br><span class="line">        vnode,</span><br><span class="line">        insertedVnodeQueue,</span><br><span class="line">        <span class="comment">// extremely rare edge case: do not insert if old element is in a</span></span><br><span class="line">        <span class="comment">// leaving transition. Only happens when combining transition +</span></span><br><span class="line">        <span class="comment">// keep-alive + HOCs. (#4590)</span></span><br><span class="line">        oldElm._leaveCb ? <span class="literal">null</span> : parentElm,</span><br><span class="line">        nodeOps.nextSibling(oldElm)</span><br><span class="line">      );</span><br><span class="line"></span><br><span class="line">      <span class="comment">// update parent placeholder node element, recursively</span></span><br><span class="line">      <span class="keyword">if</span> (isDef(vnode.parent)) &#123;</span><br><span class="line">        <span class="keyword">var</span> ancestor = vnode.parent;</span><br><span class="line">        <span class="keyword">var</span> patchable = isPatchable(vnode);</span><br><span class="line">        <span class="keyword">while</span> (ancestor) &#123;</span><br><span class="line">          <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; cbs.destroy.length; ++i) &#123;</span><br><span class="line">            cbs.destroy[i](ancestor);</span><br><span class="line">          &#125;</span><br><span class="line">          ancestor.elm = vnode.elm;</span><br><span class="line">          <span class="keyword">if</span> (patchable) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">var</span> i$<span class="number">1</span> = <span class="number">0</span>; i$<span class="number">1</span> &lt; cbs.create.length; ++i$<span class="number">1</span>) &#123;</span><br><span class="line">              cbs.create[i$<span class="number">1</span>](emptyNode, ancestor);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// #6513</span></span><br><span class="line">            <span class="comment">// invoke insert hooks that may have been merged by create hooks.</span></span><br><span class="line">            <span class="comment">// e.g. for directives that uses the "inserted" hook.</span></span><br><span class="line">            <span class="keyword">var</span> insert = ancestor.data.hook.insert;</span><br><span class="line">            <span class="keyword">if</span> (insert.merged) &#123;</span><br><span class="line">              <span class="comment">// start at index 1 to avoid re-invoking component mounted hook</span></span><br><span class="line">              <span class="keyword">for</span> (<span class="keyword">var</span> i$<span class="number">2</span> = <span class="number">1</span>; i$<span class="number">2</span> &lt; insert.fns.length; i$<span class="number">2</span>++) &#123;</span><br><span class="line">                insert.fns[i$<span class="number">2</span>]();</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            registerRef(ancestor);</span><br><span class="line">          &#125;</span><br><span class="line">          ancestor = ancestor.parent;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// destroy old node</span></span><br><span class="line">      <span class="keyword">if</span> (isDef(parentElm)) &#123;</span><br><span class="line">        removeVnodes(parentElm, [oldVnode], <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isDef(oldVnode.tag)) &#123;</span><br><span class="line">        invokeDestroyHook(oldVnode);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  invokeInsertHook(vnode, insertedVnodeQueue, isInitialPatch);</span><br><span class="line">  <span class="keyword">return</span> vnode.elm</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<ol>
-<li>如果vnode不存在儿oldVnode存在 销毁oldVnode</li>
-<li>如果oldVnode不存在而vnode存在 则调用createElm创建新的节点</li>
-<li>如果oldVnode存在<blockquote>
-<ol>
-<li>如果oldVnode不是真实节点并且oldVnode和vnode是相同节点 则调用patchVnode进行比较</li>
-<li>如果oldVnode是真实节点(说明是组件初始化的过程), 调用createElm创建新节点 并调用removeVnodes将oldVnode对应的老节点移除</li>
-</ol>
-</blockquote>
-</li>
-</ol>
-<h4 id="patchVnode"><a href="#patchVnode" class="headerlink" title="patchVnode"></a>patchVnode</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">patchVnode</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  oldVnode,</span></span></span><br><span class="line"><span class="function"><span class="params">  vnode,</span></span></span><br><span class="line"><span class="function"><span class="params">  insertedVnodeQueue,</span></span></span><br><span class="line"><span class="function"><span class="params">  ownerArray,</span></span></span><br><span class="line"><span class="function"><span class="params">  index,</span></span></span><br><span class="line"><span class="function"><span class="params">  removeOnly</span></span></span><br><span class="line"><span class="function"><span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (oldVnode === vnode) &#123;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (isDef(vnode.elm) &amp;&amp; isDef(ownerArray)) &#123;</span><br><span class="line">    <span class="comment">// clone reused vnode</span></span><br><span class="line">    vnode = ownerArray[index] = cloneVNode(vnode);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> elm = vnode.elm = oldVnode.elm;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (isTrue(oldVnode.isAsyncPlaceholder)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (isDef(vnode.asyncFactory.resolved)) &#123;</span><br><span class="line">      hydrate(oldVnode.elm, vnode, insertedVnodeQueue);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      vnode.isAsyncPlaceholder = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// reuse element for static trees.</span></span><br><span class="line">  <span class="comment">// note we only do this if the vnode is cloned -</span></span><br><span class="line">  <span class="comment">// if the new node is not cloned it means the render functions have been</span></span><br><span class="line">  <span class="comment">// reset by the hot-reload-api and we need to do a proper re-render.</span></span><br><span class="line">  <span class="keyword">if</span> (isTrue(vnode.isStatic) &amp;&amp;</span><br><span class="line">    isTrue(oldVnode.isStatic) &amp;&amp;</span><br><span class="line">    vnode.key === oldVnode.key &amp;&amp;</span><br><span class="line">    (isTrue(vnode.isCloned) || isTrue(vnode.isOnce))</span><br><span class="line">  ) &#123;</span><br><span class="line">    vnode.componentInstance = oldVnode.componentInstance;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> i;</span><br><span class="line">  <span class="keyword">var</span> data = vnode.data;</span><br><span class="line">  <span class="keyword">if</span> (isDef(data) &amp;&amp; isDef(i = data.hook) &amp;&amp; isDef(i = i.prepatch)) &#123;</span><br><span class="line">    i(oldVnode, vnode);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> oldCh = oldVnode.children;</span><br><span class="line">  <span class="keyword">var</span> ch = vnode.children;</span><br><span class="line">  <span class="keyword">if</span> (isDef(data) &amp;&amp; isPatchable(vnode)) &#123;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; cbs.update.length; ++i) &#123; cbs.update[i](oldVnode, vnode); &#125;</span><br><span class="line">    <span class="keyword">if</span> (isDef(i = data.hook) &amp;&amp; isDef(i = i.update)) &#123; i(oldVnode, vnode); &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (isUndef(vnode.text)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (isDef(oldCh) &amp;&amp; isDef(ch)) &#123;</span><br><span class="line">      <span class="keyword">if</span> (oldCh !== ch) &#123; updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly); &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isDef(ch)) &#123;</span><br><span class="line">      &#123;</span><br><span class="line">        checkDuplicateKeys(ch);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (isDef(oldVnode.text)) &#123; nodeOps.setTextContent(elm, <span class="string">''</span>); &#125;</span><br><span class="line">      addVnodes(elm, <span class="literal">null</span>, ch, <span class="number">0</span>, ch.length - <span class="number">1</span>, insertedVnodeQueue);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isDef(oldCh)) &#123;</span><br><span class="line">      removeVnodes(elm, oldCh, <span class="number">0</span>, oldCh.length - <span class="number">1</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isDef(oldVnode.text)) &#123;</span><br><span class="line">      nodeOps.setTextContent(elm, <span class="string">''</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (oldVnode.text !== vnode.text) &#123;</span><br><span class="line">    nodeOps.setTextContent(elm, vnode.text);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (isDef(data)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (isDef(i = data.hook) &amp;&amp; isDef(i = i.postpatch)) &#123; i(oldVnode, vnode); &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ol>
-<li>如果oldVnode完全等于vnode return</li>
-<li>如果oldVnode和vnode都是静态节点，且vnode的key等于oldVnode的key，且vnode是克隆节点或者v-once控制的节点的时候 只需要把<br>oldVnode的componentInstance复制给vnode即可</li>
-<li>如果vnode不是文本节点<blockquote>
-<ol>
-<li>如果oldVnode存在children且vnode存在children 且两个children 不完全相等 执行updateChildren</li>
-<li>如果只有vnode存在children子节点， 调用addVnodes添加子节点</li>
-<li>如果只有oldVnode存在子节点， 调用removeVnodes移除这些子节点</li>
-<li>如果vnode和oldVnode都没有子节点，但是oldVnode是文本节点 则把oldVnode对应的真实dom的文本内容清空</li>
-</ol>
-</blockquote>
-</li>
-<li>如果vnode是文本节点且文本内容和oldnode的文本内容不一样， 则把vnode的文本内容赋值给oldVnode对应dom节点的文本</li>
-</ol>
-<h4 id="updateChildren"><a href="#updateChildren" class="headerlink" title="updateChildren"></a>updateChildren</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateChildren</span> (<span class="params">parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oldStartIdx = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">var</span> newStartIdx = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">var</span> oldEndIdx = oldCh.length - <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">var</span> oldStartVnode = oldCh[<span class="number">0</span>];</span><br><span class="line">  <span class="keyword">var</span> oldEndVnode = oldCh[oldEndIdx];</span><br><span class="line">  <span class="keyword">var</span> newEndIdx = newCh.length - <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">var</span> newStartVnode = newCh[<span class="number">0</span>];</span><br><span class="line">  <span class="keyword">var</span> newEndVnode = newCh[newEndIdx];</span><br><span class="line">  <span class="keyword">var</span> oldKeyToIdx, idxInOld, vnodeToMove, refElm;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// removeOnly is a special flag used only by &lt;transition-group&gt;</span></span><br><span class="line">  <span class="comment">// to ensure removed elements stay in correct relative positions</span></span><br><span class="line">  <span class="comment">// during leaving transitions</span></span><br><span class="line">  <span class="keyword">var</span> canMove = !removeOnly;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">    checkDuplicateKeys(newCh);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (oldStartIdx &lt;= oldEndIdx &amp;&amp; newStartIdx &lt;= newEndIdx) &#123;</span><br><span class="line">    <span class="keyword">if</span> (isUndef(oldStartVnode)) &#123;</span><br><span class="line">      oldStartVnode = oldCh[++oldStartIdx]; <span class="comment">// Vnode has been moved left</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isUndef(oldEndVnode)) &#123;</span><br><span class="line">      oldEndVnode = oldCh[--oldEndIdx];</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (sameVnode(oldStartVnode, newStartVnode)) &#123;</span><br><span class="line">      patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue, newCh, newStartIdx);</span><br><span class="line">      oldStartVnode = oldCh[++oldStartIdx];</span><br><span class="line">      newStartVnode = newCh[++newStartIdx];</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (sameVnode(oldEndVnode, newEndVnode)) &#123;</span><br><span class="line">      patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue, newCh, newEndIdx);</span><br><span class="line">      oldEndVnode = oldCh[--oldEndIdx];</span><br><span class="line">      newEndVnode = newCh[--newEndIdx];</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (sameVnode(oldStartVnode, newEndVnode)) &#123; <span class="comment">// Vnode moved right</span></span><br><span class="line">      patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue, newCh, newEndIdx);</span><br><span class="line">      canMove &amp;&amp; nodeOps.insertBefore(parentElm, oldStartVnode.elm, nodeOps.nextSibling(oldEndVnode.elm));</span><br><span class="line">      oldStartVnode = oldCh[++oldStartIdx];</span><br><span class="line">      newEndVnode = newCh[--newEndIdx];</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (sameVnode(oldEndVnode, newStartVnode)) &#123; <span class="comment">// Vnode moved left</span></span><br><span class="line">      patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue, newCh, newStartIdx);</span><br><span class="line">      canMove &amp;&amp; nodeOps.insertBefore(parentElm, oldEndVnode.elm, oldStartVnode.elm);</span><br><span class="line">      oldEndVnode = oldCh[--oldEndIdx];</span><br><span class="line">      newStartVnode = newCh[++newStartIdx];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (isUndef(oldKeyToIdx)) &#123; oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx); &#125;</span><br><span class="line">      idxInOld = isDef(newStartVnode.key)</span><br><span class="line">        ? oldKeyToIdx[newStartVnode.key]</span><br><span class="line">        : findIdxInOld(newStartVnode, oldCh, oldStartIdx, oldEndIdx);</span><br><span class="line">      <span class="keyword">if</span> (isUndef(idxInOld)) &#123; <span class="comment">// New element</span></span><br><span class="line">        createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, <span class="literal">false</span>, newCh, newStartIdx);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        vnodeToMove = oldCh[idxInOld];</span><br><span class="line">        <span class="keyword">if</span> (sameVnode(vnodeToMove, newStartVnode)) &#123;</span><br><span class="line">          patchVnode(vnodeToMove, newStartVnode, insertedVnodeQueue, newCh, newStartIdx);</span><br><span class="line">          oldCh[idxInOld] = <span class="literal">undefined</span>;</span><br><span class="line">          canMove &amp;&amp; nodeOps.insertBefore(parentElm, vnodeToMove.elm, oldStartVnode.elm);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">// same key but different element. treat as new element</span></span><br><span class="line">          createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, <span class="literal">false</span>, newCh, newStartIdx);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      newStartVnode = newCh[++newStartIdx];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (oldStartIdx &gt; oldEndIdx) &#123;</span><br><span class="line">    refElm = isUndef(newCh[newEndIdx + <span class="number">1</span>]) ? <span class="literal">null</span> : newCh[newEndIdx + <span class="number">1</span>].elm;</span><br><span class="line">    addVnodes(parentElm, refElm, newCh, newStartIdx, newEndIdx, insertedVnodeQueue);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (newStartIdx &gt; newEndIdx) &#123;</span><br><span class="line">    removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>updateChildren方法主要通过while循环去对比新旧两棵树的子节点来更新dom</p>
-<ol>
-<li>如果oldStartVnode不存在 则将oldStartVnode设置为下一个子节点 oldStartIdx也指向这个子节点</li>
-<li>如果oldEndVnode不存在 oldEndVnode指向上一个子节点 oldEndIdx也指向这个子节点</li>
-<li>如果oldStartVnode和newStartVnode是同一个子节点 调用patchVnode 进行比较 并且将oldStartVnode和newStartVnode设置为下一个子节点</li>
-<li>如果oldEndVnode和newEndVnode是同一个节点， 调用patchVnode进行比对， 同时将他们设置为上一个节点</li>
-<li>如果oldStartVnode和newEndVnode是同一个子节点， 调用patchVnode进行比对 将这个节点移到oldEndVnode下一个兄弟节点的前面 并将oldStartVnode指向下一个 newEndVnode指向下一个</li>
-<li>如果oldEndVnode和newStartVnode是同一个子节点 调用patchVnode进行比对 将这个节点移到oldStartVnode对应节点的前面 并将oldEndVnode指向前一个节点 newStartVnode指向下一个节点</li>
-<li>如果以上都不成立 根据newStartVnode的key值在oldVnodeChildren中进行查找<blockquote>
-<ol>
-<li>如果oldVnodeChildren中存在key值一样</li>
-<li>如果oldVnodeChildren中找到的节点和newStartVnode是相同节点，调用patchVnode的比对并将目标节点移至oldStartVnode的前面</li>
-<li>如果不是相同节点 则调用createElm创建新的节点</li>
-<li>如果找不到和newStartVnode的key值一样的节点 则调用createElm创建新的节点</li>
-</ol>
-</blockquote>
-</li>
-</ol>
-<p>跳出while循环后 还要针对oldStartIdx和oldEndIdx进行操作</p>
-<ol>
-<li>如果oldStartIdx 大于 oldEndIdx 说明newVnodesChildren没有遍历完 执行addVnodes</li>
-<li>如果newStartIdx &gt; newEndIdx 说明oldVnodeChildren没有遍历完 执行removeVnodes</li>
-</ol>
-<p>以上就是整个patch过程， 尤其是updateChildren的逻辑还是很精妙的 通过不断缩减两条边界线去判断有无相同节点 不管是空间复杂度还是时间复杂度都减少了很多</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1890,7 +1954,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-count">25</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1903,7 +1967,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
@@ -1940,7 +2004,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
