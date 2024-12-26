@@ -74,6 +74,65 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-electron使用教程" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/05/06/electron%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" class="article-date">
+  <time class="dt-published" datetime="2023-05-06T07:00:01.000Z" itemprop="datePublished">2023-05-06</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/05/06/electron%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/">Electron使用教程</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h3 id="electron官网"><a href="#electron官网" class="headerlink" title="electron官网"></a><a target="_blank" rel="noopener" href="https://www.electronjs.org/">electron官网</a></h3><h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><ul>
+<li>新建项目目录</li>
+<li>yarn add electron</li>
+<li>yarn add @electron-forge&#x2F;cli electron-rebuild -D</li>
+</ul>
+<h4 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h4><h5 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h5><ul>
+<li>main.js 应用入口文件<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">createWindow</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// 加载UI代码</span></span><br><span class="line">    <span class="keyword">const</span> mainWindow = <span class="keyword">new</span> <span class="title class_">BrowserWindow</span>(&#123;</span><br><span class="line">        <span class="attr">fullscreen</span>: <span class="literal">true</span>,  <span class="comment">// 全屏窗口</span></span><br><span class="line">        <span class="comment">// kiosk: true,  // 服务亭模式</span></span><br><span class="line">        <span class="comment">// frame: false,  // 是否显示窗口边缘框架</span></span><br><span class="line">        <span class="comment">// resizable: false,  // 不可更改窗口尺寸</span></span><br><span class="line">        <span class="comment">// maximizable: true, // 支持最大化</span></span><br><span class="line">        <span class="comment">// show: false,  // 为了让初始化窗口显示无闪烁，先关闭显示，等待加载完成后再显示。</span></span><br><span class="line">        <span class="comment">// width: 800,</span></span><br><span class="line">        <span class="comment">// height: 600,</span></span><br><span class="line">        <span class="comment">// ...windowOpenConfig,</span></span><br><span class="line">        <span class="attr">webPreferences</span>: &#123;</span><br><span class="line">            <span class="comment">// 用于读取本地语音文件</span></span><br><span class="line">            <span class="attr">webSecurity</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="comment">// 是否能能在渲染页面中使用node模块</span></span><br><span class="line">            <span class="attr">nodeIntegration</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">nodeIntegrationInWorker</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="comment">// contextBridge usage 开启后打开沙盒模式 无法直接通过preload挂在在global上</span></span><br><span class="line">            <span class="comment">// contextIsolation: true,</span></span><br><span class="line">            <span class="attr">preload</span>: path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;preload.js&#x27;</span>),</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 加载html代码 也可以是http链接 可以是个单页应用服务入口url</span></span><br><span class="line">    mainWindow.<span class="title function_">loadFile</span>(<span class="string">&#x27;./demo.html&#x27;</span>)</span><br><span class="line">    <span class="comment">// mainWindow.loadURL(&#x27;http://localhost:3000/demo.html&#x27;)</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// This method will be called when Electron has finished</span></span><br><span class="line"><span class="comment">// initialization and is ready to create browser windows.</span></span><br><span class="line"><span class="comment">// Some APIs can only be used after this event occurs.</span></span><br><span class="line">app.<span class="title function_">whenReady</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">createWindow</span>()</span><br><span class="line">  <span class="comment">// 隐藏系统菜单</span></span><br><span class="line">  <span class="title class_">Menu</span>.<span class="title function_">setApplicationMenu</span>(<span class="literal">null</span>)</span><br><span class="line"></span><br><span class="line">  app.<span class="title function_">on</span>(<span class="string">&#x27;activate&#x27;</span>, <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// On macOS it&#x27;s common to re-create a window in the app when the</span></span><br><span class="line">    <span class="comment">// dock icon is clicked and there are no other windows open.</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="title class_">BrowserWindow</span>.<span class="title function_">getAllWindows</span>().<span class="property">length</span> === <span class="number">0</span>) <span class="title function_">createWindow</span>()</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Quit when all windows are closed, except on macOS. There, it&#x27;s common</span></span><br><span class="line"><span class="comment">// for applications and their menu bar to stay active until the user quits</span></span><br><span class="line"><span class="comment">// explicitly with Cmd + Q.</span></span><br><span class="line">app.<span class="title function_">on</span>(<span class="string">&#x27;window-all-closed&#x27;</span>, <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">  systemLogger.<span class="title function_">info</span>(<span class="string">&#x27;主程序关闭&#x27;</span>)</span><br><span class="line">  <span class="comment">// 手动销毁子进程 经测试子进程内的socket会自动随子进程一起销毁</span></span><br><span class="line">  <span class="keyword">if</span> (process.<span class="property">platform</span> !== <span class="string">&#x27;darwin&#x27;</span>) &#123;</span><br><span class="line">    app.<span class="title function_">quit</span>()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></li>
+<li>preload.js 负责与渲染进程进行通信<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * The preload script runs before. It has access to web APIs</span></span><br><span class="line"><span class="comment"> * as well as Electron&#x27;s renderer process modules and some</span></span><br><span class="line"><span class="comment"> * polyfilled Node.js functions.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * https://www.electronjs.org/docs/latest/tutorial/sandbox</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> &#123; contextBridge, ipcRenderer &#125; = <span class="built_in">require</span>(<span class="string">&#x27;electron&#x27;</span>)</span><br><span class="line"></span><br><span class="line">contextBridge.<span class="title function_">exposeInMainWorld</span>(<span class="string">&#x27;electronAPI&#x27;</span>, &#123;</span><br><span class="line">  </span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="通信"><a href="#通信" class="headerlink" title="通信"></a>通信</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1. 主进程主动推送</span><br><span class="line">```js</span><br><span class="line">// 在main.js中主动发送</span><br><span class="line">mainWindow.webContents.send(&#x27;ui-receive-message&#x27;, &#123;</span><br><span class="line">    msg: &#x27;hello&#x27;,</span><br><span class="line">&#125;)</span><br><span class="line">// preload.js中</span><br><span class="line">contextBridge.exposeInMainWorld(&#x27;electronAPI&#x27;, &#123;</span><br><span class="line">    receive: (cb) =&gt; ipcRenderer.on(&#x27;ui-receive-message&#x27;, cb),</span><br><span class="line">&#125;)</span><br><span class="line">// UI层</span><br><span class="line">window.electronAPI.receive((sender, data) =&gt; &#123;</span><br><span class="line">    console.log(data.msg) // hello</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>渲染进程主动通信<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// preload.js</span></span><br><span class="line">contextBridge.<span class="title function_">exposeInMainWorld</span>(<span class="string">&#x27;electronAPI&#x27;</span>, &#123;</span><br><span class="line">    <span class="attr">logToFile</span>: <span class="function">(<span class="params">payload</span>) =&gt;</span> ipcRenderer.<span class="title function_">invoke</span>(<span class="string">&#x27;log-to-file&#x27;</span>, payload),</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// main.js 订阅消息</span></span><br><span class="line">ipcMain.<span class="title function_">handle</span>(<span class="string">&#x27;log-to-file&#x27;</span>, <span class="function">(<span class="params">event, data</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 打印日志到本地</span></span><br><span class="line">    logger.<span class="title function_">info</span>(data.<span class="property">msg</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">void</span> <span class="number">0</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// UI层</span></span><br><span class="line"><span class="variable language_">window</span>.<span class="property">electronAPI</span>.<span class="title function_">logToFile</span>(&#123; <span class="attr">msg</span>: <span class="string">&#x27;操作失败&#x27;</span> &#125;)</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="自启动"><a href="#自启动" class="headerlink" title="自启动"></a>自启动</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title class_">AutoLaunch</span> = <span class="built_in">require</span>(<span class="string">&#x27;auto-launch&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">AppAutoLaunch</span> = <span class="keyword">new</span> <span class="title class_">AutoLaunch</span>(&#123;</span><br><span class="line">    <span class="attr">name</span>: app.<span class="title function_">getName</span>(),</span><br><span class="line">    <span class="comment">// path: &#x27;&#x27;,</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="title class_">AppAutoLaunch</span>.<span class="title function_">enable</span>()</span><br><span class="line"><span class="title class_">AppAutoLaunch</span>.<span class="title function_">isEnabled</span>()</span><br><span class="line">    .<span class="title function_">then</span>(<span class="function">(<span class="params">isEnabled</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(isEnabled)&#123;</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="title class_">AppAutoLaunch</span>.<span class="title function_">enable</span>()</span><br><span class="line">    &#125;)</span><br><span class="line">    .<span class="title function_">catch</span>(<span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">        systemLogger.<span class="title function_">error</span>(<span class="string">`自启动设置失败：<span class="subst">$&#123;parseError(err)&#125;</span>`</span>)</span><br><span class="line">    &#125;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h4><p>electron应用打包需要依赖 <code>@electron-forge/cli</code><br>可在<code>forge.config.js</code>文件中进行配置不同平台的打包设置<br>通过<code>electron-forge package</code>命令进行对应平台的打包操作</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; name &#125; = <span class="built_in">require</span>(<span class="string">&#x27;./package.json&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">  <span class="attr">rebuildConfig</span>: &#123;&#125;,</span><br><span class="line">  <span class="attr">makers</span>: [</span><br><span class="line">    <span class="comment">// &#123;</span></span><br><span class="line">    <span class="comment">//   name: &#x27;@electron-forge/maker-squirrel&#x27;,</span></span><br><span class="line">    <span class="comment">//   config: &#123;&#125;,</span></span><br><span class="line">    <span class="comment">// &#125;,</span></span><br><span class="line">    <span class="comment">// &#123;</span></span><br><span class="line">    <span class="comment">//   name: &#x27;@electron-forge/maker-zip&#x27;,</span></span><br><span class="line">    <span class="comment">//   platforms: [&#x27;darwin&#x27;],</span></span><br><span class="line">    <span class="comment">// &#125;,</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&#x27;@electron-forge/maker-deb&#x27;</span>,</span><br><span class="line">      <span class="attr">config</span>: &#123;</span><br><span class="line">        <span class="attr">options</span>: &#123;</span><br><span class="line">          <span class="attr">productName</span>: name,</span><br><span class="line">          name,</span><br><span class="line">          <span class="attr">icon</span>: <span class="string">&#x27;image/logo.png&#x27;</span></span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// &#123;</span></span><br><span class="line">    <span class="comment">//   name: &#x27;@electron-forge/maker-rpm&#x27;,</span></span><br><span class="line">    <span class="comment">//   config: &#123;&#125;,</span></span><br><span class="line">    <span class="comment">// &#125;,</span></span><br><span class="line">  ],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="CI-CD基础镜像搭建-以linux平台为例"><a href="#CI-CD基础镜像搭建-以linux平台为例" class="headerlink" title="CI&#x2F;CD基础镜像搭建 (以linux平台为例)"></a>CI&#x2F;CD基础镜像搭建 (以linux平台为例)</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">FROM node:14.20.0-alpine</span><br><span class="line"></span><br><span class="line">RUN apk update</span><br><span class="line">RUN apk add dpkg</span><br><span class="line">RUN apk add fakeroot</span><br><span class="line">RUN apk add rpm</span><br><span class="line">RUN apk add git</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/05/06/electron%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" data-id="cm54yagl00005b3hg0fzqhdde" data-title="Electron使用教程" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker%E3%80%81node/" rel="tag">docker、node</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-悲观锁-乐观锁" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/" class="article-date">
@@ -144,7 +203,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/" data-id="cm54s5dpu000uk5hgenzya5y4" data-title="悲观锁/乐观锁" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/" data-id="cm54yagl5000wb3hgdwu5c06p" data-title="悲观锁/乐观锁" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -277,7 +336,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/" data-id="cm54s5dpq0005k5hg5yz06k8j" data-title="qiankun微前端实践" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/" data-id="cm54yagl2000bb3hgdxu76ir5" data-title="qiankun微前端实践" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -351,7 +410,7 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/" data-id="cm54s5dpn0001k5hghr078r8m" data-title="Vue2.x之v-model详解" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/" data-id="cm54yagky0001b3hgcvxggmqr" data-title="Vue2.x之v-model详解" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -459,7 +518,7 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/" data-id="cm54s5dpl0000k5hga6ake894" data-title="Vue2.x-数据响应Watcher篇详解" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/" data-id="cm54yagkv0000b3hgc1eddbtd" data-title="Vue2.x-数据响应Watcher篇详解" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -570,7 +629,7 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/" data-id="cm54s5dpq0008k5hgh3s51yco" data-title="Vue2.x之数据响应篇" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/" data-id="cm54yagkz0003b3hgfibfaaw6" data-title="Vue2.x之数据响应篇" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -646,7 +705,7 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/11/25/next-js%E5%88%9D%E6%8E%A2/" data-id="cm54s5dpp0004k5hg1845envf" data-title="next.js从入门到重新入门" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/11/25/next-js%E5%88%9D%E6%8E%A2/" data-id="cm54yagl4000pb3hgfzpd087y" data-title="next.js从入门到重新入门" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -769,7 +828,7 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/09/24/%E6%B5%85%E6%9E%90webpack%E5%BC%82%E6%AD%A5%E6%A8%A1%E5%9D%97%E5%AF%BC%E5%85%A5%E5%8E%9F%E7%90%86/" data-id="cm54s5dpv0012k5hg0g9z8f3m" data-title="浅析webpack异步模块导入原理" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/09/24/%E6%B5%85%E6%9E%90webpack%E5%BC%82%E6%AD%A5%E6%A8%A1%E5%9D%97%E5%AF%BC%E5%85%A5%E5%8E%9F%E7%90%86/" data-id="cm54yagl7001ab3hg3ffya4u2" data-title="浅析webpack异步模块导入原理" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -827,7 +886,7 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/08/13/%E5%88%86%E4%BA%AB%E4%B8%80%E6%AC%A1%E8%A3%85%E6%9C%BA%E4%BD%93%E9%AA%8C/" data-id="cm54s5dpt000pk5hgg1nn9rl5" data-title="分享一次小白装机体验" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/08/13/%E5%88%86%E4%BA%AB%E4%B8%80%E6%AC%A1%E8%A3%85%E6%9C%BA%E4%BD%93%E9%AA%8C/" data-id="cm54yagl5000qb3hg77iy9iar" data-title="分享一次小白装机体验" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -865,79 +924,10 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/08/09/%E5%AE%9E%E8%B7%B5travis-ci/" data-id="cm54s5dpu000sk5hg8n39aoln" data-title="实践travis-ci" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/08/09/%E5%AE%9E%E8%B7%B5travis-ci/" data-id="cm54yagl5000ub3hg1qa7awuj" data-title="实践travis-ci" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-使用gitlab-ci集成前端项目" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2019/07/26/%E4%BD%BF%E7%94%A8gitlab-ci%E9%9B%86%E6%88%90%E5%89%8D%E7%AB%AF%E9%A1%B9%E7%9B%AE/" class="article-date">
-  <time class="dt-published" datetime="2019-07-26T03:13:16.000Z" itemprop="datePublished">2019-07-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2019/07/26/%E4%BD%BF%E7%94%A8gitlab-ci%E9%9B%86%E6%88%90%E5%89%8D%E7%AB%AF%E9%A1%B9%E7%9B%AE/">使用gitlab-ci集成前端项目</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>这几天正好有空（划水）在研究ci方面的一些基础知识 主要是对着官方文档做参考并加以实践<br>先介绍一下小弟对于gitlab-ci的认知（免责声明）</p>
-<ol>
-<li>开发者通过配置gitlab-ci.yml文件 在每次代码产生push或者有新的tag产生时触发ci脚本</li>
-<li>gitlab-ci集成流程由多个job组成， 每个job跑在不同的gitlab-runner中， 也可以多个job形成依赖关系 这点倒跟docker有类似的地方</li>
-</ol>
-<h4 id="怎么用"><a href="#怎么用" class="headerlink" title="怎么用"></a>怎么用</h4><p><a target="_blank" rel="noopener" href="https://docs.gitlab.com/ce/ci/yaml/README.html#tags">官方文档</a></p>
-<p>文档讲解的很清楚 这里不多赘述了 主要就是几个参数的使用 如下图所示：<br><img src="https://esymeptoo.github.io/images/gitlab-ci1.png" alt="gitlab-ci"></p>
-<p>本次我们以前端项目的自动化为例，做一个简要的介绍<br>我司的前端项目构建时主要有三个阶段 test、build、deploy</p>
-<ol>
-<li>test阶段主要负责做一些单元测试、代码lint检查等</li>
-<li>build阶段负责将代码打包发到CDN 并根据打包文件生成项目配置文件</li>
-<li>deploy阶段负责 从生成的配置文件中获取最新的静态资源地址 并保存到redis中 以便node服务器去获取最近一次的发版内容</li>
-</ol>
-<p>实际情况远比这些上述要复杂的多 但是本次我们讲的是gitlab-ci用法 下面我会举个demo 包教不包会嘿嘿😋<br>如图<br><img src="https://esymeptoo.github.io/images/gitlab-ci-pipeline.png" alt="gitlab-ci"></p>
-<p>这是一个常规项目的ci流程<br>图中将ci分为三个阶段 Test、Build、Deploy 接下来我会依据这三个阶段实践一下</p>
-<p>我们在项目中创建index.js<br>目标是达到能通过不同的分支去构建不同的环境变量从而打印出不同的env名<br>内容如下:</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> env = process.<span class="property">env</span>.<span class="property">NODE_ENV</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;env&#125;</span>, 蔡徐坤`</span>)</span><br></pre></td></tr></table></figure>
-
-<p>在package.json scripts中加入</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;build&quot;</span><span class="punctuation">:</span> <span class="string">&quot;export NODE_ENV=$CI_ENVIRONMENT_NAME &amp;&amp; node index.js&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>再新建.gitlab-ci.yml文件<br>内容如下:</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">image:</span> <span class="string">xxxx</span>    <span class="string">//</span> <span class="string">通常是docker-node镜像</span></span><br><span class="line"></span><br><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">build</span></span><br><span class="line">  </span><br><span class="line"><span class="attr">build:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">run</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">tags:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">2B</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">master@xxxx</span></span><br></pre></td></tr></table></figure>
-
-<p>上面的job 会在master分支push代码后触发npm run build命令<br>environment的name参数对应package.json中的$CI_ENVIRONMENT_NAME参数<br>所以我们可以进一步通过ci提供的模板功能来达到不同分支触发不同构建参数的目的</p>
-<p>如下:</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">.build-template:</span> <span class="string">$build-template</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="string">script</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">run</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">tags:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">2B</span></span><br><span class="line">    </span><br><span class="line"><span class="attr">build-dev:</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="string">*build-template</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">alpha</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">dev@xxxx</span>  </span><br><span class="line">    </span><br><span class="line"><span class="attr">build-beta:</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="string">*build-template</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">beta</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">dev@xxxx</span>  </span><br></pre></td></tr></table></figure>
-
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>gitlab-ci的用法自由度非常高 这种持续集成方案的出现让开发者在部署方面节省了很多成本。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2019/07/26/%E4%BD%BF%E7%94%A8gitlab-ci%E9%9B%86%E6%88%90%E5%89%8D%E7%AB%AF%E9%A1%B9%E7%9B%AE/" data-id="cm54s5dps000jk5hggj8i75vu" data-title="使用gitlab-ci集成前端项目" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gitlab-ci/" rel="tag">gitlab-ci</a></li></ul>
-
     </footer>
   </div>
   
@@ -974,7 +964,7 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/React%E3%80%81SSR/" style="font-size: 10px;">React、SSR</a> <a href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" style="font-size: 10px;">Vue2.x、指令、v-model</a> <a href="/tags/Watcher%E7%AF%87/" style="font-size: 10px;">Watcher篇</a> <a href="/tags/docker%E3%80%81node/" style="font-size: 10px;">docker、node</a> <a href="/tags/gitlab-ci/" style="font-size: 10px;">gitlab-ci</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/js%E3%80%81es6/" style="font-size: 10px;">js、es6</a> <a href="/tags/mvvm/" style="font-size: 10px;">mvvm</a> <a href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" style="font-size: 10px;">nodejs 锁 并发</a> <a href="/tags/qiankun%E3%80%81micro-frontend/" style="font-size: 10px;">qiankun、micro-frontend</a> <a href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">react ref 笔记</a> <a href="/tags/redux%E3%80%81react/" style="font-size: 10px;">redux、react</a> <a href="/tags/redux%E3%80%81react-redux/" style="font-size: 10px;">redux、react-redux</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue2.x、Observer、Dep、Watcher、个人笔记</a> <a href="/tags/vuex%E3%80%81takeLatest/" style="font-size: 10px;">vuex、takeLatest</a> <a href="/tags/vue%E3%80%81lazyload/" style="font-size: 10px;">vue、lazyload</a> <a href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue、笔记</a>
+      <a href="/tags/React%E3%80%81SSR/" style="font-size: 10px;">React、SSR</a> <a href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" style="font-size: 10px;">Vue2.x、指令、v-model</a> <a href="/tags/Watcher%E7%AF%87/" style="font-size: 10px;">Watcher篇</a> <a href="/tags/docker%E3%80%81node/" style="font-size: 20px;">docker、node</a> <a href="/tags/gitlab-ci/" style="font-size: 10px;">gitlab-ci</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/js%E3%80%81es6/" style="font-size: 10px;">js、es6</a> <a href="/tags/mvvm/" style="font-size: 10px;">mvvm</a> <a href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" style="font-size: 10px;">nodejs 锁 并发</a> <a href="/tags/qiankun%E3%80%81micro-frontend/" style="font-size: 10px;">qiankun、micro-frontend</a> <a href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">react ref 笔记</a> <a href="/tags/redux%E3%80%81react/" style="font-size: 10px;">redux、react</a> <a href="/tags/redux%E3%80%81react-redux/" style="font-size: 10px;">redux、react-redux</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue2.x、Observer、Dep、Watcher、个人笔记</a> <a href="/tags/vuex%E3%80%81takeLatest/" style="font-size: 10px;">vuex、takeLatest</a> <a href="/tags/vue%E3%80%81lazyload/" style="font-size: 10px;">vue、lazyload</a> <a href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue、笔记</a>
     </div>
   </div>
 
@@ -983,7 +973,7 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
   <div class="widget-wrap">
     <h3 class="widget-title">Archiv</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
     </div>
   </div>
 
@@ -994,6 +984,10 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
     <h3 class="widget-title">letzter Beitrag</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2023/05/06/electron%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/">Electron使用教程</a>
+          </li>
         
           <li>
             <a href="/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/">悲观锁/乐观锁</a>
@@ -1009,10 +1003,6 @@ needCompositionGuard作用是处理了中文输入法的问题，并将’if($ev
         
           <li>
             <a href="/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/">Vue2.x-数据响应Watcher篇详解</a>
-          </li>
-        
-          <li>
-            <a href="/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/">Vue2.x之数据响应篇</a>
           </li>
         
       </ul>

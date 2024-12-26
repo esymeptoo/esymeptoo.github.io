@@ -74,6 +74,75 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-使用gitlab-ci集成前端项目" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2019/07/26/%E4%BD%BF%E7%94%A8gitlab-ci%E9%9B%86%E6%88%90%E5%89%8D%E7%AB%AF%E9%A1%B9%E7%9B%AE/" class="article-date">
+  <time class="dt-published" datetime="2019-07-26T03:13:16.000Z" itemprop="datePublished">2019-07-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2019/07/26/%E4%BD%BF%E7%94%A8gitlab-ci%E9%9B%86%E6%88%90%E5%89%8D%E7%AB%AF%E9%A1%B9%E7%9B%AE/">使用gitlab-ci集成前端项目</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>这几天正好有空（划水）在研究ci方面的一些基础知识 主要是对着官方文档做参考并加以实践<br>先介绍一下小弟对于gitlab-ci的认知（免责声明）</p>
+<ol>
+<li>开发者通过配置gitlab-ci.yml文件 在每次代码产生push或者有新的tag产生时触发ci脚本</li>
+<li>gitlab-ci集成流程由多个job组成， 每个job跑在不同的gitlab-runner中， 也可以多个job形成依赖关系 这点倒跟docker有类似的地方</li>
+</ol>
+<h4 id="怎么用"><a href="#怎么用" class="headerlink" title="怎么用"></a>怎么用</h4><p><a target="_blank" rel="noopener" href="https://docs.gitlab.com/ce/ci/yaml/README.html#tags">官方文档</a></p>
+<p>文档讲解的很清楚 这里不多赘述了 主要就是几个参数的使用 如下图所示：<br><img src="https://esymeptoo.github.io/images/gitlab-ci1.png" alt="gitlab-ci"></p>
+<p>本次我们以前端项目的自动化为例，做一个简要的介绍<br>我司的前端项目构建时主要有三个阶段 test、build、deploy</p>
+<ol>
+<li>test阶段主要负责做一些单元测试、代码lint检查等</li>
+<li>build阶段负责将代码打包发到CDN 并根据打包文件生成项目配置文件</li>
+<li>deploy阶段负责 从生成的配置文件中获取最新的静态资源地址 并保存到redis中 以便node服务器去获取最近一次的发版内容</li>
+</ol>
+<p>实际情况远比这些上述要复杂的多 但是本次我们讲的是gitlab-ci用法 下面我会举个demo 包教不包会嘿嘿😋<br>如图<br><img src="https://esymeptoo.github.io/images/gitlab-ci-pipeline.png" alt="gitlab-ci"></p>
+<p>这是一个常规项目的ci流程<br>图中将ci分为三个阶段 Test、Build、Deploy 接下来我会依据这三个阶段实践一下</p>
+<p>我们在项目中创建index.js<br>目标是达到能通过不同的分支去构建不同的环境变量从而打印出不同的env名<br>内容如下:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> env = process.<span class="property">env</span>.<span class="property">NODE_ENV</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;env&#125;</span>, 蔡徐坤`</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在package.json scripts中加入</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;build&quot;</span><span class="punctuation">:</span> <span class="string">&quot;export NODE_ENV=$CI_ENVIRONMENT_NAME &amp;&amp; node index.js&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>再新建.gitlab-ci.yml文件<br>内容如下:</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">image:</span> <span class="string">xxxx</span>    <span class="string">//</span> <span class="string">通常是docker-node镜像</span></span><br><span class="line"></span><br><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">build</span></span><br><span class="line">  </span><br><span class="line"><span class="attr">build:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">run</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">tags:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">2B</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">master@xxxx</span></span><br></pre></td></tr></table></figure>
+
+<p>上面的job 会在master分支push代码后触发npm run build命令<br>environment的name参数对应package.json中的$CI_ENVIRONMENT_NAME参数<br>所以我们可以进一步通过ci提供的模板功能来达到不同分支触发不同构建参数的目的</p>
+<p>如下:</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">.build-template:</span> <span class="string">$build-template</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="string">script</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">run</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">tags:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">2B</span></span><br><span class="line">    </span><br><span class="line"><span class="attr">build-dev:</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="string">*build-template</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">alpha</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">dev@xxxx</span>  </span><br><span class="line">    </span><br><span class="line"><span class="attr">build-beta:</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="string">*build-template</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">beta</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">dev@xxxx</span>  </span><br></pre></td></tr></table></figure>
+
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>gitlab-ci的用法自由度非常高 这种持续集成方案的出现让开发者在部署方面节省了很多成本。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2019/07/26/%E4%BD%BF%E7%94%A8gitlab-ci%E9%9B%86%E6%88%90%E5%89%8D%E7%AB%AF%E9%A1%B9%E7%9B%AE/" data-id="cm54yagl4000lb3hggfz88cpv" data-title="使用gitlab-ci集成前端项目" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gitlab-ci/" rel="tag">gitlab-ci</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-有关vue中key的使用" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2019/07/05/%E6%9C%89%E5%85%B3vue%E4%B8%ADkey%E7%9A%84%E4%BD%BF%E7%94%A8/" class="article-date">
@@ -111,7 +180,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/07/05/%E6%9C%89%E5%85%B3vue%E4%B8%ADkey%E7%9A%84%E4%BD%BF%E7%94%A8/" data-id="cm54s5dpv0010k5hg13js3mmp" data-title="有关vue中key的使用" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/07/05/%E6%9C%89%E5%85%B3vue%E4%B8%ADkey%E7%9A%84%E4%BD%BF%E7%94%A8/" data-id="cm54yagl60012b3hghejt5rnl" data-title="有关vue中key的使用" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -210,7 +279,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/07/03/vue-patch/" data-id="cm54s5dpr000dk5hgavip8yas" data-title="vue-patch" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/07/03/vue-patch/" data-id="cm54yagl10009b3hg8g7y0n7a" data-title="vue-patch" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -250,7 +319,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/07/01/%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AAmvvm/" data-id="cm54s5dpw0016k5hg9b2tbvvv" data-title="简单实现一个mvvm" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/07/01/%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AAmvvm/" data-id="cm54yagl60014b3hgg5sscatb" data-title="简单实现一个mvvm" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -295,7 +364,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/06/06/%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84event%20loop%E6%A8%A1%E5%9E%8B/" data-id="cm54s5dpv0013k5hgecrbg3m8" data-title="浏览器的event loop模型" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/06/06/%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84event%20loop%E6%A8%A1%E5%9E%8B/" data-id="cm54yagl70016b3hg3uwt3mmk" data-title="浏览器的event loop模型" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -356,7 +425,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/05/06/docker%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2%E5%89%8D%E7%AB%AF%E9%A1%B9%E7%9B%AE/" data-id="cm54s5dpp0003k5hgecjy47mb" data-title="docker容器化部署前端项目" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/05/06/docker%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2%E5%89%8D%E7%AB%AF%E9%A1%B9%E7%9B%AE/" data-id="cm54yagl00004b3hgbhpo0gjc" data-title="docker容器化部署前端项目" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -420,7 +489,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/04/02/react%E4%B9%8B%E8%BD%AC%E5%8F%91ref/" data-id="cm54s5dpr0009k5hg5ffi7j6z" data-title="react之转发ref" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/04/02/react%E4%B9%8B%E8%BD%AC%E5%8F%91ref/" data-id="cm54yagl2000db3hgbf3tg1nm" data-title="react之转发ref" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -522,7 +591,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/03/22/react-redux%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" data-id="cm54s5dpr000bk5hg2izxew7p" data-title="react-redux源码解读" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/03/22/react-redux%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" data-id="cm54yagl10008b3hgfhrfhbpj" data-title="react-redux源码解读" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -599,7 +668,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/03/20/%E8%AF%BBredux%E6%BA%90%E7%A0%81/" data-id="cm54s5dpw0017k5hg63f6224m" data-title="读redux源码" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/03/20/%E8%AF%BBredux%E6%BA%90%E7%A0%81/" data-id="cm54yagl70017b3hg8h1f88kl" data-title="读redux源码" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
@@ -665,67 +734,12 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2019/03/19/vuex%E7%9A%84takeLatest%E5%8C%96/" data-id="cm54s5dps000fk5hg6fkaexby" data-title="vuex的takeLatest化" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="http://example.com/2019/03/19/vuex%E7%9A%84takeLatest%E5%8C%96/" data-id="cm54yagl3000hb3hg5qeddm5g" data-title="vuex的takeLatest化" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vuex%E3%80%81takeLatest/" rel="tag">vuex、takeLatest</a></li></ul>
 
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-有关position定位的几种属性" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2019/02/06/%E6%9C%89%E5%85%B3position%E5%AE%9A%E4%BD%8D%E7%9A%84%E5%87%A0%E7%A7%8D%E5%B1%9E%E6%80%A7/" class="article-date">
-  <time class="dt-published" datetime="2019-02-06T06:50:39.000Z" itemprop="datePublished">2019-02-06</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2019/02/06/%E6%9C%89%E5%85%B3position%E5%AE%9A%E4%BD%8D%E7%9A%84%E5%87%A0%E7%A7%8D%E5%B1%9E%E6%80%A7/">有关position定位的几种属性</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h4 id="relative"><a href="#relative" class="headerlink" title="relative"></a>relative</h4><ol>
-<li>relative定位是脱离文档流的相对定位方式 不管父布局的position是什么属性 都是相对于父元素的左上角进行定位 会受到父元素padding的影响</li>
-<li>虽然是脱离文档流 但是会占位置</li>
-</ol>
-<h4 id="static"><a href="#static" class="headerlink" title="static"></a>static</h4><ol>
-<li>元素的默认定位方式</li>
-</ol>
-<h4 id="absolute"><a href="#absolute" class="headerlink" title="absolute"></a>absolute</h4><ol>
-<li>是使元素脱离文档流绝对定位方式 会根据存在relative或者absolute布局的上层元素进行布局 不会受到该上层元素padding的影响</li>
-</ol>
-<h4 id="fixed"><a href="#fixed" class="headerlink" title="fixed"></a>fixed</h4><ol>
-<li>相对于视口的绝对定位方式</li>
-<li>可通过设置父布局transform 改变其定位相对的父布局</li>
-</ol>
-<h4 id="sticky"><a href="#sticky" class="headerlink" title="sticky"></a>sticky</h4><ol>
-<li>粘性布局</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2019/02/06/%E6%9C%89%E5%85%B3position%E5%AE%9A%E4%BD%8D%E7%9A%84%E5%87%A0%E7%A7%8D%E5%B1%9E%E6%80%A7/" data-id="cm54s5dpu000wk5hg5ih1f4bj" data-title="有关position定位的几种属性" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
-      
-      
-      
     </footer>
   </div>
   
@@ -762,7 +776,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/React%E3%80%81SSR/" style="font-size: 10px;">React、SSR</a> <a href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" style="font-size: 10px;">Vue2.x、指令、v-model</a> <a href="/tags/Watcher%E7%AF%87/" style="font-size: 10px;">Watcher篇</a> <a href="/tags/docker%E3%80%81node/" style="font-size: 10px;">docker、node</a> <a href="/tags/gitlab-ci/" style="font-size: 10px;">gitlab-ci</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/js%E3%80%81es6/" style="font-size: 10px;">js、es6</a> <a href="/tags/mvvm/" style="font-size: 10px;">mvvm</a> <a href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" style="font-size: 10px;">nodejs 锁 并发</a> <a href="/tags/qiankun%E3%80%81micro-frontend/" style="font-size: 10px;">qiankun、micro-frontend</a> <a href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">react ref 笔记</a> <a href="/tags/redux%E3%80%81react/" style="font-size: 10px;">redux、react</a> <a href="/tags/redux%E3%80%81react-redux/" style="font-size: 10px;">redux、react-redux</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue2.x、Observer、Dep、Watcher、个人笔记</a> <a href="/tags/vuex%E3%80%81takeLatest/" style="font-size: 10px;">vuex、takeLatest</a> <a href="/tags/vue%E3%80%81lazyload/" style="font-size: 10px;">vue、lazyload</a> <a href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue、笔记</a>
+      <a href="/tags/React%E3%80%81SSR/" style="font-size: 10px;">React、SSR</a> <a href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" style="font-size: 10px;">Vue2.x、指令、v-model</a> <a href="/tags/Watcher%E7%AF%87/" style="font-size: 10px;">Watcher篇</a> <a href="/tags/docker%E3%80%81node/" style="font-size: 20px;">docker、node</a> <a href="/tags/gitlab-ci/" style="font-size: 10px;">gitlab-ci</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/js%E3%80%81es6/" style="font-size: 10px;">js、es6</a> <a href="/tags/mvvm/" style="font-size: 10px;">mvvm</a> <a href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" style="font-size: 10px;">nodejs 锁 并发</a> <a href="/tags/qiankun%E3%80%81micro-frontend/" style="font-size: 10px;">qiankun、micro-frontend</a> <a href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">react ref 笔记</a> <a href="/tags/redux%E3%80%81react/" style="font-size: 10px;">redux、react</a> <a href="/tags/redux%E3%80%81react-redux/" style="font-size: 10px;">redux、react-redux</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue2.x、Observer、Dep、Watcher、个人笔记</a> <a href="/tags/vuex%E3%80%81takeLatest/" style="font-size: 10px;">vuex、takeLatest</a> <a href="/tags/vue%E3%80%81lazyload/" style="font-size: 10px;">vue、lazyload</a> <a href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue、笔记</a>
     </div>
   </div>
 
@@ -771,7 +785,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archiv</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
     </div>
   </div>
 
@@ -782,6 +796,10 @@
     <h3 class="widget-title">letzter Beitrag</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2023/05/06/electron%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/">Electron使用教程</a>
+          </li>
         
           <li>
             <a href="/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/">悲观锁/乐观锁</a>
@@ -797,10 +815,6 @@
         
           <li>
             <a href="/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/">Vue2.x-数据响应Watcher篇详解</a>
-          </li>
-        
-          <li>
-            <a href="/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/">Vue2.x之数据响应篇</a>
           </li>
         
       </ul>
