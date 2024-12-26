@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>悲观锁/乐观锁 | 周小e丶的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="什么场景需要加锁在并发的场景下经常会出现多个请求同时打进服务，导致出现资源抢占的问题，比如库存、匹配的场景。  举个库存的栗子，请求A和请求B同时进行下单操作，导致两个请求在获取库存余量的时候都是原始值，分别进行了库存-1的update操作，但是最后我们会发现，原本库存应该减2，实际上只减了1，这就是并发带来的读写不一致问题，这时候就需要加锁操作。  悲观锁 悲观锁认为任何时候都会有并发的资源抢占">
+<meta property="og:type" content="article">
+<meta property="og:title" content="悲观锁&#x2F;乐观锁">
+<meta property="og:url" content="http://example.com/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/index.html">
+<meta property="og:site_name" content="周小e丶的博客">
+<meta property="og:description" content="什么场景需要加锁在并发的场景下经常会出现多个请求同时打进服务，导致出现资源抢占的问题，比如库存、匹配的场景。  举个库存的栗子，请求A和请求B同时进行下单操作，导致两个请求在获取库存余量的时候都是原始值，分别进行了库存-1的update操作，但是最后我们会发现，原本库存应该减2，实际上只减了1，这就是并发带来的读写不一致问题，这时候就需要加锁操作。  悲观锁 悲观锁认为任何时候都会有并发的资源抢占">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-12-18T06:40:19.000Z">
+<meta property="article:modified_time" content="2024-12-26T02:38:44.282Z">
+<meta property="article:author" content="周小e丶">
+<meta property="article:tag" content="nodejs 锁 并发">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="周小e丶的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">周小e丶的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">coding...</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Suche"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Suche"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-悲观锁-乐观锁" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/" class="article-date">
+  <time class="dt-published" datetime="2020-12-18T06:40:19.000Z" itemprop="datePublished">2020-12-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      悲观锁/乐观锁
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h4 id="什么场景需要加锁"><a href="#什么场景需要加锁" class="headerlink" title="什么场景需要加锁"></a>什么场景需要加锁</h4><p>在并发的场景下经常会出现多个请求同时打进服务，导致出现资源抢占的问题，比如库存、匹配的场景。</p>
+<blockquote>
+<p>举个库存的栗子，请求A和请求B同时进行下单操作，导致两个请求在获取库存余量的时候都是原始值，分别进行了库存-1的update操作，<br>但是最后我们会发现，原本库存应该减2，实际上只减了1，这就是并发带来的读写不一致问题，这时候就需要加锁操作。</p>
+</blockquote>
+<h4 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h4><blockquote>
+<p>悲观锁认为任何时候都会有并发的资源抢占，也可以理解为独占锁，所以在加锁期间别的请求会处于等待中并重复请求该锁是否被释放。</p>
+</blockquote>
+<h5 id="实现方案"><a href="#实现方案" class="headerlink" title="实现方案"></a>实现方案</h5><ol>
+<li>直接通过内存加锁 <a target="_blank" rel="noopener" href="https://github.com/neosmart/AsyncLock">asyncLock</a><blockquote>
+<p>这种加锁方式是直接在内存里通过变量控制，将请求的执行回调通过一个key保存在队列(FIFO)里，</p>
+</blockquote>
+</li>
+</ol>
+<p>比如请求A进来：</p>
+<blockquote>
+<ul>
+<li>如果队列为空，将回调A打进队列，并执行回调A，回调A执行完后会检查该队列中是否存在别的任务，如果存在则会循环调用</li>
+<li>如果队列不为空，将回调A打进队列，等待前面的循环调用</li>
+</ul>
+</blockquote>
+<p>直到该队列没有任务了，会通过key删除这个队列</p>
+<p>看个简单的demo</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Queue</span> &#123;</span><br><span class="line">  private <span class="attr">pending</span>: boolean = <span class="literal">false</span></span><br><span class="line">  public <span class="attr">list</span>: any[] = []</span><br><span class="line"></span><br><span class="line">  <span class="title function_">setPending</span>(<span class="params">val</span>) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">pending</span> = val</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="title function_">register</span>(<span class="params">fn</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="title function_">async</span> (resolve, reject) =&gt; &#123;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">list</span>.<span class="title function_">push</span>([fn, resolve, reject])</span><br><span class="line">      <span class="keyword">if</span> (!<span class="variable language_">this</span>.<span class="property">pending</span>) <span class="keyword">await</span> <span class="variable language_">this</span>.<span class="title function_">execute</span>()</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">async</span> <span class="title function_">execute</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="title function_">setPending</span>(<span class="literal">true</span>)</span><br><span class="line">    <span class="keyword">const</span> [fn, resolve, reject] = <span class="variable language_">this</span>.<span class="property">list</span>.<span class="title function_">pop</span>()</span><br><span class="line">    <span class="keyword">await</span> <span class="title function_">fn</span>(resolve, reject)</span><br><span class="line">    <span class="variable language_">this</span>.<span class="title function_">setPending</span>(<span class="literal">false</span>)</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">list</span>.<span class="property">length</span>) <span class="keyword">await</span> <span class="variable language_">this</span>.<span class="title function_">execute</span>()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> queue = <span class="keyword">new</span> <span class="title class_">Queue</span>()</span><br><span class="line">router.<span class="title function_">post</span>(<span class="string">&#x27;/xxx&#x27;</span>, <span class="keyword">async</span> ctx =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> result = <span class="keyword">await</span> queue.<span class="title function_">register</span>(<span class="title function_">async</span> (resolve, reject) =&gt; &#123;</span><br><span class="line">    <span class="keyword">await</span> <span class="title function_">sleep</span>(<span class="number">2000</span>)</span><br><span class="line">    <span class="title function_">resolve</span>()</span><br><span class="line">  &#125;)</span><br><span class="line">  ctx.<span class="property">status</span> = <span class="number">200</span></span><br><span class="line">  ctx.<span class="property">body</span> = &#123;</span><br><span class="line">    <span class="attr">data</span>: result,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这种加锁的方式优点成本比较低，对于并发不高的业务可以使用，但是缺点也很明显</p>
+<ol>
+<li>任务都是串行的，并发多了会造成阻塞</li>
+<li>对于集群服务而言内存是不共享的，多台机器就不能这么玩了</li>
+</ol>
+</blockquote>
+<ol start="2">
+<li>引入redis锁<br>redis加分布式锁方法是通过原子操作实现的，众所周知原子操作是不可分割的，在执行完毕之前不会被任何其它任务或事件中断。<blockquote>
+<p>所以我们在请求A打进来的时候对库存操作的加锁，这样请求B进来会先去读锁是否被释放，等锁释放了再去操作库存，这样就能够避免读写不一样的问题</p>
+</blockquote>
+</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">RedisLock</span> &#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="attr">expireTime</span>: <span class="built_in">number</span></span><br><span class="line">  <span class="keyword">private</span> <span class="attr">lockTimeout</span>: <span class="built_in">number</span></span><br><span class="line">  <span class="keyword">private</span> <span class="attr">expireUnit</span>: <span class="string">&#x27;PX&#x27;</span> | <span class="string">&#x27;EX&#x27;</span></span><br><span class="line">  <span class="keyword">private</span> <span class="attr">expireMode</span>: <span class="string">&#x27;NX&#x27;</span> | <span class="string">&#x27;XX&#x27;</span></span><br><span class="line">  <span class="keyword">private</span> <span class="attr">client</span>: <span class="built_in">any</span></span><br><span class="line"></span><br><span class="line">  <span class="title function_">constructor</span>(<span class="params">client, <span class="attr">options</span>: <span class="title class_">LockOption</span> = &#123;&#125;</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!client) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&#x27;缺少redis客户端&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">expireTime</span> = options.<span class="property">expireTime</span> || <span class="number">2</span> <span class="comment">// 锁的有效期</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">lockTimeout</span> = options.<span class="property">lockTimeout</span> || <span class="number">5</span> <span class="comment">// 锁超时时间</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">expireUnit</span> = options.<span class="property">expireUnit</span> || <span class="string">&#x27;EX&#x27;</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">expireMode</span> = options.<span class="property">expireMode</span> || <span class="string">&#x27;NX&#x27;</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">client</span> = client</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 加锁</span></span><br><span class="line">  <span class="keyword">async</span> <span class="title function_">lock</span>(<span class="params">key, val, expire?</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> self = <span class="variable language_">this</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">retry</span>(<span class="params"></span>) &#123;</span><br><span class="line">      <span class="comment">// 加锁</span></span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> result = <span class="keyword">await</span> self.<span class="property">client</span>.<span class="title function_">set</span>(key, val, self.<span class="property">expireUnit</span>, expire || self.<span class="property">expireTime</span>, self.<span class="property">expireMode</span>)</span><br><span class="line">        <span class="keyword">if</span> (result === <span class="string">&#x27;OK&#x27;</span>) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">await</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> <span class="built_in">setTimeout</span>(resolve, <span class="number">200</span>))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">retry</span>()</span><br><span class="line">      &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(e)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)()</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 解锁</span></span><br><span class="line">  <span class="keyword">async</span> <span class="title function_">unlock</span>(<span class="params">key, val</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> script = <span class="string">&quot;if redis.call(&#x27;get&#x27;,KEYS[1]) == ARGV[1] then&quot;</span> +</span><br><span class="line">      <span class="string">&quot;   return redis.call(&#x27;del&#x27;,KEYS[1]) &quot;</span> +</span><br><span class="line">      <span class="string">&quot;else&quot;</span> +</span><br><span class="line">      <span class="string">&quot;   return 0 &quot;</span> +</span><br><span class="line">      <span class="string">&quot;end&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="variable language_">this</span>.<span class="property">client</span>.<span class="built_in">eval</span>(script, <span class="number">1</span>, key, val)</span><br><span class="line">      <span class="keyword">return</span> result === <span class="number">1</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(e)</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码加锁的时候使用了’NX’，保证锁存在时再有进程进行加锁会执行失败，且解锁过程是需要执行lua脚本进行原子操作<br>如何使用</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> lock = <span class="keyword">new</span> <span class="title class_">RedisLock</span>(redis)</span><br><span class="line">router.<span class="title function_">post</span>(<span class="string">&#x27;/xxx&#x27;</span>, <span class="keyword">async</span> ctx =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> lock.<span class="title function_">lock</span>(<span class="string">&#x27;key&#x27;</span>, <span class="string">&#x27;val&#x27;</span>)</span><br><span class="line">  <span class="keyword">await</span> <span class="title function_">sleep</span>(xxx)</span><br><span class="line">  <span class="keyword">await</span> lock.<span class="title function_">unlock</span>(<span class="string">&#x27;key&#x27;</span>, <span class="string">&#x27;val&#x27;</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>使用redis分布式锁的好处是redis读取速度快且能在集群中使用，当然并发量高了也能在使用redis加锁的同时做一层redis缓存提升服务性能。</p>
+<h4 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h4><p>乐观锁是一种极其乐观的加锁方式，它认为不会出现资源抢占的情况，常见的策略比如CAS(Compare and Swap)，在执行写操作前我们记录数据的初始值和预期值，<br>更新时check一下初始值和数据库当前的值 如果一样就将预期值更新进去，否则就认为是过期请求，再次尝试。</p>
+<p>乐观锁的使用成本比较高，因为会出现ABA的情况，库存可能被请求B从3修改成2，又从2修改成3，这样A的原始值和预期值是一样的，就需要在表里增加version标记每次更新的版本。 </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/" data-id="cm54s1l35000qdqhg7dsi8zin" data-title="悲观锁/乐观锁" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" rel="tag">nodejs 锁 并发</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">qiankun微前端实践</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/React%E3%80%81SSR/" rel="tag">React、SSR</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" rel="tag">Vue2.x、指令、v-model</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Watcher%E7%AF%87/" rel="tag">Watcher篇</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker%E3%80%81node/" rel="tag">docker、node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab-ci/" rel="tag">gitlab-ci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js%E3%80%81es6/" rel="tag">js、es6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mvvm/" rel="tag">mvvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" rel="tag">nodejs 锁 并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qiankun%E3%80%81micro-frontend/" rel="tag">qiankun、micro-frontend</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" rel="tag">react ref 笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redux%E3%80%81react/" rel="tag">redux、react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redux%E3%80%81react-redux/" rel="tag">redux、react-redux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" rel="tag">vue2.x、Observer、Dep、Watcher、个人笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex%E3%80%81takeLatest/" rel="tag">vuex、takeLatest</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue%E3%80%81lazyload/" rel="tag">vue、lazyload</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" rel="tag">vue、笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/React%E3%80%81SSR/" style="font-size: 10px;">React、SSR</a> <a href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" style="font-size: 10px;">Vue2.x、指令、v-model</a> <a href="/tags/Watcher%E7%AF%87/" style="font-size: 10px;">Watcher篇</a> <a href="/tags/docker%E3%80%81node/" style="font-size: 10px;">docker、node</a> <a href="/tags/gitlab-ci/" style="font-size: 10px;">gitlab-ci</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/js%E3%80%81es6/" style="font-size: 10px;">js、es6</a> <a href="/tags/mvvm/" style="font-size: 10px;">mvvm</a> <a href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" style="font-size: 10px;">nodejs 锁 并发</a> <a href="/tags/qiankun%E3%80%81micro-frontend/" style="font-size: 10px;">qiankun、micro-frontend</a> <a href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">react ref 笔记</a> <a href="/tags/redux%E3%80%81react/" style="font-size: 10px;">redux、react</a> <a href="/tags/redux%E3%80%81react-redux/" style="font-size: 10px;">redux、react-redux</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue2.x、Observer、Dep、Watcher、个人笔记</a> <a href="/tags/vuex%E3%80%81takeLatest/" style="font-size: 10px;">vuex、takeLatest</a> <a href="/tags/vue%E3%80%81lazyload/" style="font-size: 10px;">vue、lazyload</a> <a href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue、笔记</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/">悲观锁/乐观锁</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/">qiankun微前端实践</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/">Vue2.x之v-model详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/">Vue2.x-数据响应Watcher篇详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/">Vue2.x之数据响应篇</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 周小e丶<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

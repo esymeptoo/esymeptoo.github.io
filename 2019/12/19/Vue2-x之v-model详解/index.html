@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Vue2.x之v-model详解 | 周小e丶的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="传送门在看本篇之前，你可以看看博主的另两篇文章，有助于对本篇的理解  Vue2.x数据响应篇 Vue2.x-Watcher篇  v-model传送门的两章详细讲述了Vue在处理数据响应的过程，但关于Vue在runtime时期的compile还没梳理，这章我们先从v-model开始吧。v-model是Vue提供给用户做双向绑定的一个指令语法 原文传送门官网对于用法讲得很清楚，可以给input、sel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue2.x之v-model详解">
+<meta property="og:url" content="http://example.com/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="周小e丶的博客">
+<meta property="og:description" content="传送门在看本篇之前，你可以看看博主的另两篇文章，有助于对本篇的理解  Vue2.x数据响应篇 Vue2.x-Watcher篇  v-model传送门的两章详细讲述了Vue在处理数据响应的过程，但关于Vue在runtime时期的compile还没梳理，这章我们先从v-model开始吧。v-model是Vue提供给用户做双向绑定的一个指令语法 原文传送门官网对于用法讲得很清楚，可以给input、sel">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-12-19T08:39:16.000Z">
+<meta property="article:modified_time" content="2024-12-26T02:38:44.277Z">
+<meta property="article:author" content="周小e丶">
+<meta property="article:tag" content="Vue2.x、指令、v-model">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="周小e丶的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">周小e丶的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">coding...</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Suche"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Suche"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-Vue2-x之v-model详解" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/" class="article-date">
+  <time class="dt-published" datetime="2019-12-19T08:39:16.000Z" itemprop="datePublished">2019-12-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Vue2.x之v-model详解
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h4 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h4><p>在看本篇之前，你可以看看博主的另两篇文章，有助于对本篇的理解</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://esymeptoo.github.io/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/">Vue2.x数据响应篇</a></li>
+<li><a target="_blank" rel="noopener" href="https://esymeptoo.github.io/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/">Vue2.x-Watcher篇</a></li>
+</ol>
+<h4 id="v-model"><a href="#v-model" class="headerlink" title="v-model"></a>v-model</h4><p>传送门的两章详细讲述了Vue在处理数据响应的过程，但关于Vue在runtime时期的compile还没梳理，这章我们先从v-model开始吧。<br>v-model是Vue提供给用户做双向绑定的一个指令语法 <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/api/#v-model">原文传送门</a><br>官网对于用法讲得很清楚，可以给input、select、checkbox、radio和自定义组件使用v-model指令</p>
+<h4 id="上demo"><a href="#上demo" class="headerlink" title="上demo"></a>上demo</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;root&quot;&gt;</span><br><span class="line">  &lt;input v-model=&quot;input.value&quot; type=&quot;text&quot; /&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;script src=&quot;./vue.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">  new Vue(&#123;</span><br><span class="line">    el: &#x27;#root&#x27;,</span><br><span class="line">    data() &#123;</span><br><span class="line">      return &#123;</span><br><span class="line">        value: &#x27;demo&#x27;,</span><br><span class="line">        input: &#123;</span><br><span class="line">          value: &#x27;demo&#x27;,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>以上是我们常见的v-model用法，当我们再input内输入内容时 组件实例上的数据也会随之修改，这就实现了数据的双向绑定</p>
+<h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><p>在模板编译阶段，v-model会被解析到el.directives中，我们从genDirectives方法看起</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">genDirectives</span> (<span class="params">el, state</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> dirs = el.<span class="property">directives</span>;</span><br><span class="line">  <span class="keyword">if</span> (!dirs) &#123; <span class="keyword">return</span> &#125;</span><br><span class="line">  <span class="keyword">var</span> res = <span class="string">&#x27;directives:[&#x27;</span>;</span><br><span class="line">  <span class="keyword">var</span> hasRuntime = <span class="literal">false</span>;</span><br><span class="line">  <span class="keyword">var</span> i, l, dir, needRuntime;</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>, l = dirs.<span class="property">length</span>; i &lt; l; i++) &#123;</span><br><span class="line">    dir = dirs[i];</span><br><span class="line">    needRuntime = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">var</span> gen = state.<span class="property">directives</span>[dir.<span class="property">name</span>];</span><br><span class="line">    <span class="keyword">if</span> (gen) &#123;</span><br><span class="line">      <span class="comment">// compile-time directive that manipulates AST.</span></span><br><span class="line">      <span class="comment">// returns true if it also needs a runtime counterpart.</span></span><br><span class="line">      needRuntime = !!<span class="title function_">gen</span>(el, dir, state.<span class="property">warn</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (needRuntime) &#123;</span><br><span class="line">      hasRuntime = <span class="literal">true</span>;</span><br><span class="line">      res += <span class="string">&quot;&#123;name:\&quot;&quot;</span> + (dir.<span class="property">name</span>) + <span class="string">&quot;\&quot;,rawName:\&quot;&quot;</span> + (dir.<span class="property">rawName</span>) + <span class="string">&quot;\&quot;&quot;</span> + (dir.<span class="property">value</span> ? (<span class="string">&quot;,value:(&quot;</span> + (dir.<span class="property">value</span>) + <span class="string">&quot;),expression:&quot;</span> + (<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(dir.<span class="property">value</span>))) : <span class="string">&#x27;&#x27;</span>) + (dir.<span class="property">arg</span> ? (<span class="string">&quot;,arg:&quot;</span> + (dir.<span class="property">isDynamicArg</span> ? dir.<span class="property">arg</span> : (<span class="string">&quot;\&quot;&quot;</span> + (dir.<span class="property">arg</span>) + <span class="string">&quot;\&quot;&quot;</span>))) : <span class="string">&#x27;&#x27;</span>) + (dir.<span class="property">modifiers</span> ? (<span class="string">&quot;,modifiers:&quot;</span> + (<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(dir.<span class="property">modifiers</span>))) : <span class="string">&#x27;&#x27;</span>) + <span class="string">&quot;&#125;,&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (hasRuntime) &#123;</span><br><span class="line">    <span class="keyword">return</span> res.<span class="title function_">slice</span>(<span class="number">0</span>, -<span class="number">1</span>) + <span class="string">&#x27;]&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个函数的目的是遍历el.directives里的指令，并用state里提供<br>el.directives的类型如下:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&#x27;model&#x27;</span>,</span><br><span class="line">    <span class="attr">rawName</span>: <span class="string">&#x27;v-model&#x27;</span>,</span><br><span class="line">    <span class="attr">value</span>: <span class="string">&#x27;input.value&#x27;</span>,  <span class="comment">// v-mode后的的expression</span></span><br><span class="line">    ...rest, <span class="comment">// 其余属性 有兴趣可以打印出来看看</span></span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>state.directives也提供了处理个指令的方法，对应如下:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="title function_">on</span>(<span class="params"></span>) &#123;&#125;,</span><br><span class="line">  <span class="title function_">bind</span>(<span class="params"></span>) &#123;&#125;,</span><br><span class="line">  <span class="title function_">text</span>(<span class="params"></span>) &#123;&#125;,</span><br><span class="line">  <span class="title function_">html</span>(<span class="params"></span>) &#123;&#125;,</span><br><span class="line">  <span class="title function_">model</span>(<span class="params"></span>) &#123;&#125;,</span><br><span class="line">  <span class="title function_">cloak</span>(<span class="params"></span>) &#123;&#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由此可见Vue提供了以上6中内置指令，有兴趣的同学可以到官网了解一下这几种常见指令的用法<br>回到正题，这里我们需要的是model处理指令的代码，如下:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">model</span> (<span class="params"></span></span><br><span class="line"><span class="params">  el,</span></span><br><span class="line"><span class="params">  dir,</span></span><br><span class="line"><span class="params">  _warn</span></span><br><span class="line"><span class="params"></span>) &#123;</span><br><span class="line">  warn$1 = _warn;</span><br><span class="line">  <span class="keyword">var</span> value = dir.<span class="property">value</span>;</span><br><span class="line">  <span class="keyword">var</span> modifiers = dir.<span class="property">modifiers</span>;</span><br><span class="line">  <span class="keyword">var</span> tag = el.<span class="property">tag</span>;</span><br><span class="line">  <span class="keyword">var</span> type = el.<span class="property">attrsMap</span>.<span class="property">type</span>;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="comment">// inputs with type=&quot;file&quot; are read only and setting the input&#x27;s</span></span><br><span class="line">    <span class="comment">// value will throw an error.</span></span><br><span class="line">    <span class="keyword">if</span> (tag === <span class="string">&#x27;input&#x27;</span> &amp;&amp; type === <span class="string">&#x27;file&#x27;</span>) &#123;</span><br><span class="line">      <span class="title function_">warn$1</span>(</span><br><span class="line">        <span class="string">&quot;&lt;&quot;</span> + (el.<span class="property">tag</span>) + <span class="string">&quot; v-model=\&quot;&quot;</span> + value + <span class="string">&quot;\&quot; type=\&quot;file\&quot;&gt;:\n&quot;</span> +</span><br><span class="line">        <span class="string">&quot;File inputs are read only. Use a v-on:change listener instead.&quot;</span>,</span><br><span class="line">        el.<span class="property">rawAttrsMap</span>[<span class="string">&#x27;v-model&#x27;</span>]</span><br><span class="line">      );</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (el.<span class="property">component</span>) &#123;</span><br><span class="line">    <span class="title function_">genComponentModel</span>(el, value, modifiers);</span><br><span class="line">    <span class="comment">// component v-model doesn&#x27;t need extra runtime</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (tag === <span class="string">&#x27;select&#x27;</span>) &#123;</span><br><span class="line">    <span class="title function_">genSelect</span>(el, value, modifiers);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (tag === <span class="string">&#x27;input&#x27;</span> &amp;&amp; type === <span class="string">&#x27;checkbox&#x27;</span>) &#123;</span><br><span class="line">    <span class="title function_">genCheckboxModel</span>(el, value, modifiers);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (tag === <span class="string">&#x27;input&#x27;</span> &amp;&amp; type === <span class="string">&#x27;radio&#x27;</span>) &#123;</span><br><span class="line">    <span class="title function_">genRadioModel</span>(el, value, modifiers);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (tag === <span class="string">&#x27;input&#x27;</span> || tag === <span class="string">&#x27;textarea&#x27;</span>) &#123;</span><br><span class="line">    <span class="title function_">genDefaultModel</span>(el, value, modifiers);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!config.<span class="title function_">isReservedTag</span>(tag)) &#123;</span><br><span class="line">    <span class="title function_">genComponentModel</span>(el, value, modifiers);</span><br><span class="line">    <span class="comment">// component v-model doesn&#x27;t need extra runtime</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="title function_">warn$1</span>(</span><br><span class="line">      <span class="string">&quot;&lt;&quot;</span> + (el.<span class="property">tag</span>) + <span class="string">&quot; v-model=\&quot;&quot;</span> + value + <span class="string">&quot;\&quot;&gt;: &quot;</span> +</span><br><span class="line">      <span class="string">&quot;v-model is not supported on this element type. &quot;</span> +</span><br><span class="line">      <span class="string">&#x27;If you are working with contenteditable, it\&#x27;s recommended to &#x27;</span> +</span><br><span class="line">      <span class="string">&#x27;wrap a library dedicated for that purpose inside a custom component.&#x27;</span>,</span><br><span class="line">      el.<span class="property">rawAttrsMap</span>[<span class="string">&#x27;v-model&#x27;</span>]</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ensure runtime directive metadata</span></span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从上面的代码不难看出不同类型的组件使用v-model，解析的方式也不一样，demo我们使用的是input，根据匹配规则我们先看第五个branch，genDefaultModel代码如下:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">genDefaultModel</span> (<span class="params"></span></span><br><span class="line"><span class="params">  el,</span></span><br><span class="line"><span class="params">  value,</span></span><br><span class="line"><span class="params">  modifiers</span></span><br><span class="line"><span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> type = el.<span class="property">attrsMap</span>.<span class="property">type</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// warn if v-bind:value conflicts with v-model</span></span><br><span class="line">  <span class="comment">// except for inputs with v-bind:type</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">var</span> value$1 = el.<span class="property">attrsMap</span>[<span class="string">&#x27;v-bind:value&#x27;</span>] || el.<span class="property">attrsMap</span>[<span class="string">&#x27;:value&#x27;</span>];</span><br><span class="line">    <span class="keyword">var</span> typeBinding = el.<span class="property">attrsMap</span>[<span class="string">&#x27;v-bind:type&#x27;</span>] || el.<span class="property">attrsMap</span>[<span class="string">&#x27;:type&#x27;</span>];</span><br><span class="line">    <span class="keyword">if</span> (value$1 &amp;&amp; !typeBinding) &#123;</span><br><span class="line">      <span class="keyword">var</span> binding = el.<span class="property">attrsMap</span>[<span class="string">&#x27;v-bind:value&#x27;</span>] ? <span class="string">&#x27;v-bind:value&#x27;</span> : <span class="string">&#x27;:value&#x27;</span>;</span><br><span class="line">      <span class="title function_">warn$1</span>(</span><br><span class="line">        binding + <span class="string">&quot;=\&quot;&quot;</span> + value$1 + <span class="string">&quot;\&quot; conflicts with v-model on the same element &quot;</span> +</span><br><span class="line">        <span class="string">&#x27;because the latter already expands to a value binding internally&#x27;</span>,</span><br><span class="line">        el.<span class="property">rawAttrsMap</span>[binding]</span><br><span class="line">      );</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> ref = modifiers || &#123;&#125;;</span><br><span class="line">  <span class="keyword">var</span> lazy = ref.<span class="property">lazy</span>;</span><br><span class="line">  <span class="keyword">var</span> number = ref.<span class="property">number</span>;</span><br><span class="line">  <span class="keyword">var</span> trim = ref.<span class="property">trim</span>;</span><br><span class="line">  <span class="keyword">var</span> needCompositionGuard = !lazy &amp;&amp; type !== <span class="string">&#x27;range&#x27;</span>;</span><br><span class="line">  <span class="keyword">var</span> event = lazy</span><br><span class="line">    ? <span class="string">&#x27;change&#x27;</span></span><br><span class="line">    : type === <span class="string">&#x27;range&#x27;</span></span><br><span class="line">      ? <span class="variable constant_">RANGE_TOKEN</span></span><br><span class="line">      : <span class="string">&#x27;input&#x27;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> valueExpression = <span class="string">&#x27;$event.target.value&#x27;</span>;</span><br><span class="line">  <span class="keyword">if</span> (trim) &#123;</span><br><span class="line">    valueExpression = <span class="string">&quot;$event.target.value.trim()&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (number) &#123;</span><br><span class="line">    valueExpression = <span class="string">&quot;_n(&quot;</span> + valueExpression + <span class="string">&quot;)&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> code = <span class="title function_">genAssignmentCode</span>(value, valueExpression);</span><br><span class="line">  <span class="keyword">if</span> (needCompositionGuard) &#123;</span><br><span class="line">    code = <span class="string">&quot;if($event.target.composing)return;&quot;</span> + code;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="title function_">addProp</span>(el, <span class="string">&#x27;value&#x27;</span>, (<span class="string">&quot;(&quot;</span> + value + <span class="string">&quot;)&quot;</span>));</span><br><span class="line">  <span class="title function_">addHandler</span>(el, event, code, <span class="literal">null</span>, <span class="literal">true</span>);</span><br><span class="line">  <span class="keyword">if</span> (trim || number) &#123;</span><br><span class="line">    <span class="title function_">addHandler</span>(el, <span class="string">&#x27;blur&#x27;</span>, <span class="string">&#x27;$forceUpdate()&#x27;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先判断el上是否也存在v-bind:value，为了防止和v-model冲突，会抛出错误<br>lazy、number、trim是v-model指令自带的修饰符，有兴趣的同学可以参考官网的用法</p>
+<ol>
+<li>lazy的目的是为了取代 input 监听 change 事件</li>
+<li>number的目的是为了将字符串转化为有效数字</li>
+<li>trim目的是为了去除首尾的空格<br>根据上面三个修饰符对valueExpression赋予了不同的值<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> code = <span class="title function_">genAssignmentCode</span>(value, valueExpression);</span><br></pre></td></tr></table></figure>
+我们先看genAssignmentCode的代码<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">genAssignmentCode</span> (<span class="params"></span></span><br><span class="line"><span class="params">  value,</span></span><br><span class="line"><span class="params">  assignment</span></span><br><span class="line"><span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> res = <span class="title function_">parseModel</span>(value);</span><br><span class="line">  <span class="keyword">if</span> (res.<span class="property">key</span> === <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> (value + <span class="string">&quot;=&quot;</span> + assignment)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="string">&quot;$set(&quot;</span> + (res.<span class="property">exp</span>) + <span class="string">&quot;, &quot;</span> + (res.<span class="property">key</span>) + <span class="string">&quot;, &quot;</span> + assignment + <span class="string">&quot;)&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+parseModal的代码我就不贴了，大致意思就是分析v-model的value，比如demo传入的是”input.value”，会被parseModal转化成<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">exp</span>: <span class="string">&#x27;input&#x27;</span>,</span><br><span class="line">  <span class="attr">key</span>: <span class="string">&#x27;value&#x27;</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+众所周知，v-model后面可以传入模板字符串，比如name，也可以传入对象取值的表达式，比如person.name等，<br>如果我们v-model传的是”value”，返回结果是这样的<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">exp</span>: <span class="string">&#x27;value&#x27;</span>,</span><br><span class="line">  <span class="attr">key</span>: <span class="literal">null</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+如果我们传入的是”person.chinese.name”，返回如下<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">exp</span>: <span class="string">&#x27;person.chinese&#x27;</span>,</span><br><span class="line">  <span class="attr">key</span>: <span class="string">&#x27;name&#x27;</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+接着看代码，根据我们的demo来看<br>如果v-model后面跟的是纯字符串”value”，返回”value &#x3D; $event.target.value”<br>如果v-model后面跟的对象模板字符串”input.value”，返回”$set(‘input’, ‘value’, $event.target.value)”<br>看到这儿，你应该能知道v-model是通过什么方式同步修改组件实例上的值了吧<br>回到getDefaultModel方法:<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (needCompositionGuard) &#123;</span><br><span class="line">  code = <span class="string">&quot;if($event.target.composing)return;&quot;</span> + code;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">addProp</span>(el, <span class="string">&#x27;value&#x27;</span>, (<span class="string">&quot;(&quot;</span> + value + <span class="string">&quot;)&quot;</span>));</span><br><span class="line"><span class="title function_">addHandler</span>(el, event, code, <span class="literal">null</span>, <span class="literal">true</span>);</span><br><span class="line"><span class="keyword">if</span> (trim || number) &#123;</span><br><span class="line">  <span class="title function_">addHandler</span>(el, <span class="string">&#x27;blur&#x27;</span>, <span class="string">&#x27;$forceUpdate()&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+needCompositionGuard作用是处理了中文输入法的问题，并将’if($event.target.composing)return;’拼接到genAssignmentCode的结果前面<br>addProp:<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">addProp</span> (<span class="params">el, name, value, range, dynamic</span>) &#123;</span><br><span class="line">  (el.<span class="property">props</span> || (el.<span class="property">props</span> = [])).<span class="title function_">push</span>(<span class="title function_">rangeSetItem</span>(&#123; <span class="attr">name</span>: name, <span class="attr">value</span>: value, <span class="attr">dynamic</span>: dynamic &#125;, range));</span><br><span class="line">  el.<span class="property">plain</span> = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+执行到这儿就相当于把v-model转换正v-bind:value&#x3D;”input.value”了<br>下一步addHandler的目的就是在el.events上增加input方法，把我们的code结果添加到input方法上，得到以下节点<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;input v-bind:value=&quot;input.value&quot; type=&quot;text&quot; @input=&quot;if($event.target.composing)return;$set(&#x27;input&#x27;, &#x27;value&#x27;, $event.target.value)&quot; /&gt;</span><br></pre></td></tr></table></figure>
+当然实际代码并不会直接生成这个dom节点，首先生成的应该是dom的ast结构，然后通过编译拼接成如下代码结构:<br>方便阅读，就不展示字符串了<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">with</span>(<span class="params"><span class="variable language_">this</span></span>)&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">_c</span>(</span><br><span class="line">    <span class="string">&#x27;div&#x27;</span>,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">attrs</span>:&#123;<span class="string">&quot;id&quot;</span>:<span class="string">&quot;root&quot;</span>&#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    [</span><br><span class="line">      <span class="title function_">_c</span>(</span><br><span class="line">        <span class="string">&#x27;input&#x27;</span>,</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">directives</span>:[&#123;<span class="attr">name</span>:<span class="string">&quot;model&quot;</span>,<span class="attr">rawName</span>:<span class="string">&quot;v-model&quot;</span>,<span class="attr">value</span>:(input.<span class="property">value</span>),<span class="attr">expression</span>:<span class="string">&quot;input.value&quot;</span>&#125;],</span><br><span class="line">          <span class="attr">attrs</span>:&#123;<span class="string">&quot;type&quot;</span>:<span class="string">&quot;text&quot;</span>&#125;,</span><br><span class="line">          <span class="attr">domProps</span>:&#123;<span class="string">&quot;value&quot;</span>:(input.<span class="property">value</span>)&#125;,</span><br><span class="line">          <span class="attr">on</span>:&#123;<span class="string">&quot;input&quot;</span>:<span class="keyword">function</span>(<span class="params">$event</span>)&#123;<span class="keyword">if</span>($event.<span class="property">target</span>.<span class="property">composing</span>)<span class="keyword">return</span>;$set(input, <span class="string">&quot;value&quot;</span>, $event.<span class="property">target</span>.<span class="property">value</span>)&#125;</span><br><span class="line">        &#125;&#125;)</span><br><span class="line">    ]</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+以上的代码会通过new Function()进行封装并赋值给options.render，上一章讲到的render-watcher调用更新的时候实际调用的就是这段代码</li>
+</ol>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>v-model的原理现在看来其实很明确了，就是在编译过程中会将v-model装换成v-bind:value(当然，这点因组件而异)，并在el上添加input事件，<br>如果是深层的字符串模板，会生成$set对应的方法，若是单个字符串，会直接将value &#x3D; $event.target.value拼接到input方法上。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/" data-id="cm54s1l2y0001dqhg93od99dq" data-title="Vue2.x之v-model详解" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" rel="tag">Vue2.x、指令、v-model</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          qiankun微前端实践
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">Vue2.x-数据响应Watcher篇详解</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/React%E3%80%81SSR/" rel="tag">React、SSR</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" rel="tag">Vue2.x、指令、v-model</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Watcher%E7%AF%87/" rel="tag">Watcher篇</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker%E3%80%81node/" rel="tag">docker、node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab-ci/" rel="tag">gitlab-ci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js%E3%80%81es6/" rel="tag">js、es6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mvvm/" rel="tag">mvvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" rel="tag">nodejs 锁 并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qiankun%E3%80%81micro-frontend/" rel="tag">qiankun、micro-frontend</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" rel="tag">react ref 笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redux%E3%80%81react/" rel="tag">redux、react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redux%E3%80%81react-redux/" rel="tag">redux、react-redux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" rel="tag">vue2.x、Observer、Dep、Watcher、个人笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex%E3%80%81takeLatest/" rel="tag">vuex、takeLatest</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue%E3%80%81lazyload/" rel="tag">vue、lazyload</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" rel="tag">vue、笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/React%E3%80%81SSR/" style="font-size: 10px;">React、SSR</a> <a href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" style="font-size: 10px;">Vue2.x、指令、v-model</a> <a href="/tags/Watcher%E7%AF%87/" style="font-size: 10px;">Watcher篇</a> <a href="/tags/docker%E3%80%81node/" style="font-size: 10px;">docker、node</a> <a href="/tags/gitlab-ci/" style="font-size: 10px;">gitlab-ci</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/js%E3%80%81es6/" style="font-size: 10px;">js、es6</a> <a href="/tags/mvvm/" style="font-size: 10px;">mvvm</a> <a href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" style="font-size: 10px;">nodejs 锁 并发</a> <a href="/tags/qiankun%E3%80%81micro-frontend/" style="font-size: 10px;">qiankun、micro-frontend</a> <a href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">react ref 笔记</a> <a href="/tags/redux%E3%80%81react/" style="font-size: 10px;">redux、react</a> <a href="/tags/redux%E3%80%81react-redux/" style="font-size: 10px;">redux、react-redux</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue2.x、Observer、Dep、Watcher、个人笔记</a> <a href="/tags/vuex%E3%80%81takeLatest/" style="font-size: 10px;">vuex、takeLatest</a> <a href="/tags/vue%E3%80%81lazyload/" style="font-size: 10px;">vue、lazyload</a> <a href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue、笔记</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/">悲观锁/乐观锁</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/">qiankun微前端实践</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/">Vue2.x之v-model详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/">Vue2.x-数据响应Watcher篇详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/">Vue2.x之数据响应篇</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 周小e丶<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>有关vue中key的使用 | 周小e丶的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="关于key上一张讲了vue的patch过程 有一点讲的还是很含糊的 就是key相关的提到key这概念 在vue1.0中它的前身好像是v-track 作用不用说都知道 是为了优化diff操作 那它到底是如何做到这一点的呢我们先看看代码 12345678910111213141516171819if (isUndef(oldKeyToIdx)) &#123; oldKeyToIdx &#x3D; createK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="有关vue中key的使用">
+<meta property="og:url" content="http://example.com/2019/07/05/%E6%9C%89%E5%85%B3vue%E4%B8%ADkey%E7%9A%84%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="周小e丶的博客">
+<meta property="og:description" content="关于key上一张讲了vue的patch过程 有一点讲的还是很含糊的 就是key相关的提到key这概念 在vue1.0中它的前身好像是v-track 作用不用说都知道 是为了优化diff操作 那它到底是如何做到这一点的呢我们先看看代码 12345678910111213141516171819if (isUndef(oldKeyToIdx)) &#123; oldKeyToIdx &#x3D; createK">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-07-05T08:04:15.000Z">
+<meta property="article:modified_time" content="2024-12-26T02:38:44.282Z">
+<meta property="article:author" content="周小e丶">
+<meta property="article:tag" content="前端、吹比">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="周小e丶的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">周小e丶的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">coding...</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Suche"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Suche"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-有关vue中key的使用" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2019/07/05/%E6%9C%89%E5%85%B3vue%E4%B8%ADkey%E7%9A%84%E4%BD%BF%E7%94%A8/" class="article-date">
+  <time class="dt-published" datetime="2019-07-05T08:04:15.000Z" itemprop="datePublished">2019-07-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      有关vue中key的使用
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h4 id="关于key"><a href="#关于key" class="headerlink" title="关于key"></a>关于key</h4><p>上一张讲了vue的patch过程 有一点讲的还是很含糊的 就是key相关的<br>提到key这概念 在vue1.0中它的前身好像是v-track 作用不用说都知道 是为了优化diff操作 那它到底是如何做到这一点的呢<br>我们先看看代码</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="title function_">isUndef</span>(oldKeyToIdx)) &#123; oldKeyToIdx = <span class="title function_">createKeyToOldIdx</span>(oldCh, oldStartIdx, oldEndIdx); &#125;</span><br><span class="line">idxInOld = <span class="title function_">isDef</span>(newStartVnode.<span class="property">key</span>)</span><br><span class="line">  ? oldKeyToIdx[newStartVnode.<span class="property">key</span>]</span><br><span class="line">  : <span class="title function_">findIdxInOld</span>(newStartVnode, oldCh, oldStartIdx, oldEndIdx);</span><br><span class="line"><span class="keyword">if</span> (<span class="title function_">isUndef</span>(idxInOld)) &#123; <span class="comment">// New element</span></span><br><span class="line">  <span class="title function_">createElm</span>(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.<span class="property">elm</span>, <span class="literal">false</span>, newCh, newStartIdx);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  vnodeToMove = oldCh[idxInOld];</span><br><span class="line">  <span class="comment">// 为什么不建议使用数组下标作为key 这里会判断出不是相同节点 并且会重新创建一个新节点</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="title function_">sameVnode</span>(vnodeToMove, newStartVnode)) &#123;</span><br><span class="line">    <span class="title function_">patchVnode</span>(vnodeToMove, newStartVnode, insertedVnodeQueue, newCh, newStartIdx);</span><br><span class="line">    oldCh[idxInOld] = <span class="literal">undefined</span>;</span><br><span class="line">    canMove &amp;&amp; nodeOps.<span class="title function_">insertBefore</span>(parentElm, vnodeToMove.<span class="property">elm</span>, oldStartVnode.<span class="property">elm</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// same key but different element. treat as new element</span></span><br><span class="line">    <span class="title function_">createElm</span>(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.<span class="property">elm</span>, <span class="literal">false</span>, newCh, newStartIdx);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">newStartVnode = newCh[++newStartIdx];        </span><br></pre></td></tr></table></figure>
+
+<p>这段代码是updateChildren方法里的一个if-branch 上一章节有提到这部分 我就不多赘述了<br>这段代码是干嘛的呢 先是通过oldVnodeChildren计算出老的子节点对应的key 每次updateChildren只需要计算一次</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">createKeyToOldIdx</span> (<span class="params">children, beginIdx, endIdx</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> i, key;</span><br><span class="line">  <span class="keyword">var</span> map = &#123;&#125;;</span><br><span class="line">  <span class="keyword">for</span> (i = beginIdx; i &lt;= endIdx; ++i) &#123;</span><br><span class="line">    key = children[i].<span class="property">key</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="title function_">isDef</span>(key)) &#123; map[key] = i; &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> map</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>也就是说如果一个节点有key 就把这个key当做map里的key值 把这个节点所处的index 当做value<br>比如一群子节点A, B, C, D key分别是’A’, ‘B’, ‘C’, ‘D’<br>生成的oldKeyToIdx就是</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">A</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="attr">B</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="attr">C</span>: <span class="number">2</span>,</span><br><span class="line">  <span class="attr">D</span>: <span class="number">3</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样就算这些子节点的顺序变了 但是key没变 很容易能找到它在oldVnodesChildren中对应的节点 所以这才作为性能优化的一种手段</p>
+<p>那为什么不推荐使用数组下标作为作为key呢<br>我们看看用数组下标作为key的oldKeyToIdx</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="number">0</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="number">1</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="number">2</span>: <span class="number">2</span>,</span><br><span class="line">  <span class="number">3</span>: <span class="number">3</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样如果子节点顺序发生了变化 比如变成了BADC 此时B的key由1变成了0 实际上我们在oldVnodesChildren中找到的是A<br>这时候如果A和B经过sameVnode判断不是同一个节点 会调用createElm创建新节点 那我们岂不是得不偿失啦 这样的key就没有意义了</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2019/07/05/%E6%9C%89%E5%85%B3vue%E4%B8%ADkey%E7%9A%84%E4%BD%BF%E7%94%A8/" data-id="cm54s1l35000wdqhgbglg5obx" data-title="有关vue中key的使用" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/07/26/%E4%BD%BF%E7%94%A8gitlab-ci%E9%9B%86%E6%88%90%E5%89%8D%E7%AB%AF%E9%A1%B9%E7%9B%AE/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          使用gitlab-ci集成前端项目
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/07/03/vue-patch/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">vue-patch</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/React%E3%80%81SSR/" rel="tag">React、SSR</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" rel="tag">Vue2.x、指令、v-model</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Watcher%E7%AF%87/" rel="tag">Watcher篇</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker%E3%80%81node/" rel="tag">docker、node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab-ci/" rel="tag">gitlab-ci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js%E3%80%81es6/" rel="tag">js、es6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mvvm/" rel="tag">mvvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" rel="tag">nodejs 锁 并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qiankun%E3%80%81micro-frontend/" rel="tag">qiankun、micro-frontend</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" rel="tag">react ref 笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redux%E3%80%81react/" rel="tag">redux、react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redux%E3%80%81react-redux/" rel="tag">redux、react-redux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" rel="tag">vue2.x、Observer、Dep、Watcher、个人笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex%E3%80%81takeLatest/" rel="tag">vuex、takeLatest</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue%E3%80%81lazyload/" rel="tag">vue、lazyload</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" rel="tag">vue、笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/React%E3%80%81SSR/" style="font-size: 10px;">React、SSR</a> <a href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" style="font-size: 10px;">Vue2.x、指令、v-model</a> <a href="/tags/Watcher%E7%AF%87/" style="font-size: 10px;">Watcher篇</a> <a href="/tags/docker%E3%80%81node/" style="font-size: 10px;">docker、node</a> <a href="/tags/gitlab-ci/" style="font-size: 10px;">gitlab-ci</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/js%E3%80%81es6/" style="font-size: 10px;">js、es6</a> <a href="/tags/mvvm/" style="font-size: 10px;">mvvm</a> <a href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" style="font-size: 10px;">nodejs 锁 并发</a> <a href="/tags/qiankun%E3%80%81micro-frontend/" style="font-size: 10px;">qiankun、micro-frontend</a> <a href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">react ref 笔记</a> <a href="/tags/redux%E3%80%81react/" style="font-size: 10px;">redux、react</a> <a href="/tags/redux%E3%80%81react-redux/" style="font-size: 10px;">redux、react-redux</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue2.x、Observer、Dep、Watcher、个人笔记</a> <a href="/tags/vuex%E3%80%81takeLatest/" style="font-size: 10px;">vuex、takeLatest</a> <a href="/tags/vue%E3%80%81lazyload/" style="font-size: 10px;">vue、lazyload</a> <a href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue、笔记</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/">悲观锁/乐观锁</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/">qiankun微前端实践</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/">Vue2.x之v-model详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/">Vue2.x-数据响应Watcher篇详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/">Vue2.x之数据响应篇</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 周小e丶<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

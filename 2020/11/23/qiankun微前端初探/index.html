@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>qiankun微前端实践 | 周小e丶的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="什么微前端？这几年微前端还是比较火的概念，旨在将后端微服务的理念应用于浏览器端，把Web 应用由单一的单体应用转变为多个小型前端应用聚合为一的应用 微前端的价值场景一作为项目管理者，我希望降低单体项目的维护成本(子应用拆分场景&#x2F;在业务系统聚合的同时降低复杂度) 场景二作为开发，我希望使用在保持老业务代码不动的情况下使用新的技术(子应用技术栈无关&#x2F;避免全量升级版本) 场景三作为开">
+<meta property="og:type" content="article">
+<meta property="og:title" content="qiankun微前端实践">
+<meta property="og:url" content="http://example.com/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/index.html">
+<meta property="og:site_name" content="周小e丶的博客">
+<meta property="og:description" content="什么微前端？这几年微前端还是比较火的概念，旨在将后端微服务的理念应用于浏览器端，把Web 应用由单一的单体应用转变为多个小型前端应用聚合为一的应用 微前端的价值场景一作为项目管理者，我希望降低单体项目的维护成本(子应用拆分场景&#x2F;在业务系统聚合的同时降低复杂度) 场景二作为开发，我希望使用在保持老业务代码不动的情况下使用新的技术(子应用技术栈无关&#x2F;避免全量升级版本) 场景三作为开">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-11-23T07:01:26.000Z">
+<meta property="article:modified_time" content="2024-12-26T02:38:44.278Z">
+<meta property="article:author" content="周小e丶">
+<meta property="article:tag" content="qiankun、micro-frontend">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="周小e丶的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">周小e丶的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">coding...</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Suche"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Suche"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-qiankun微前端初探" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/" class="article-date">
+  <time class="dt-published" datetime="2020-11-23T07:01:26.000Z" itemprop="datePublished">2020-11-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      qiankun微前端实践
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h3 id="什么微前端？"><a href="#什么微前端？" class="headerlink" title="什么微前端？"></a>什么微前端？</h3><p>这几年微前端还是比较火的概念，旨在将后端微服务的理念应用于浏览器端，<br>把Web 应用由单一的单体应用转变为多个小型前端应用聚合为一的应用</p>
+<h3 id="微前端的价值"><a href="#微前端的价值" class="headerlink" title="微前端的价值"></a>微前端的价值</h3><h5 id="场景一"><a href="#场景一" class="headerlink" title="场景一"></a>场景一</h5><p>作为项目管理者，我希望降低单体项目的维护成本(子应用拆分场景&#x2F;在业务系统聚合的同时降低复杂度)</p>
+<h5 id="场景二"><a href="#场景二" class="headerlink" title="场景二"></a>场景二</h5><p>作为开发，我希望使用在保持老业务代码不动的情况下使用新的技术(子应用技术栈无关&#x2F;避免全量升级版本)</p>
+<h5 id="场景三"><a href="#场景三" class="headerlink" title="场景三"></a>场景三</h5><p>作为开发，我希望在不同的项目技术环境中复用相同的代码模块以提升开发效率(微前端模块)</p>
+<h3 id="为什么不用iframe"><a href="#为什么不用iframe" class="headerlink" title="为什么不用iframe"></a>为什么不用iframe</h3><ol>
+<li>子项目需要改造，需要提供一组不带导航的功能</li>
+<li>iframe嵌入的显示区大小不容易控制，存在一定局限性</li>
+<li>URL的记录完全无效，页面刷新不能够被记忆，刷新会返回首页</li>
+<li>iframe功能之间的跳转是无效的</li>
+<li>iframe的样式显示、兼容性等都具有局限性</li>
+</ol>
+<h3 id="通过这篇文章你将了解到"><a href="#通过这篇文章你将了解到" class="headerlink" title="通过这篇文章你将了解到"></a>通过这篇文章你将了解到</h3><ol>
+<li>qiankun是怎样运行的</li>
+<li>qiankun沙盒是如何实现的</li>
+<li>qiankun是通过什么方式获取到子应用入口文件的钩子函数的</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://qiankun.umijs.org/zh/api#registermicroappsapps-lifecycles">官网文档</a></p>
+<h2 id="qiankun运行机制"><a href="#qiankun运行机制" class="headerlink" title="qiankun运行机制"></a>qiankun运行机制</h2><h3 id="single-spa"><a href="#single-spa" class="headerlink" title="single-spa"></a>single-spa</h3><p><a target="_blank" rel="noopener" href="https://github.com/single-spa/single-spa">不多讲</a></p>
+<h3 id="HTML-Entry"><a href="#HTML-Entry" class="headerlink" title="HTML-Entry"></a>HTML-Entry</h3><p><a target="_blank" rel="noopener" href="https://github.com/kuitos/import-html-entry">import-html-entry</a></p>
+<blockquote>
+<p>qiankun支持通过html直接加载子应用，需要子应用在应用入口处暴露出相应的钩子函数并通过webpack打包成umd格式，<br>qiankun会在执行子应用js代码时通过<a href="#magic">magic</a>获取到子应用的钩子函数并执行。</p>
+</blockquote>
+<blockquote>
+<p>相比于JS-Entry，好处是更加灵活，不需要在主应用声明很多scripts地址，<br>也不需要担心external库的更新问题，坏处是把解析消耗放在用户端</p>
+</blockquote>
+<h3 id="sandbox"><a href="#sandbox" class="headerlink" title="sandbox"></a>sandbox</h3><h4 id="js沙箱"><a href="#js沙箱" class="headerlink" title="js沙箱"></a>js沙箱</h4><h5 id="snapShotSandbox"><a href="#snapShotSandbox" class="headerlink" title="snapShotSandbox"></a>snapShotSandbox</h5><blockquote>
+<p>非proxy沙箱用于兼容不支持proxy的浏览器，原理就是在子应用加载前保存window对象的快照，<br>子应用销毁之后使用快照对比window，获取到子应用加载期间的增量并保存，等子应用再次被加载时重新挂在window上</p>
+</blockquote>
+<h5 id="legacySandbox"><a href="#legacySandbox" class="headerlink" title="legacySandbox"></a>legacySandbox</h5><blockquote>
+<p>基于proxy实现的沙箱，用于单例模式，也是qiankun初代版本的沙箱，该版本由singular字段控制是否使用legacySandbox，2.2版本之后使用设置loose为true</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">sandbox</span>: &#123; <span class="attr">loose</span>: <span class="literal">true</span> &#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>该沙箱通过一个空对象fakeWindow去劫持全局window，重写空对象的set和get，</li>
+</ol>
+<ul>
+<li>1.1 获取fakeWindow某个值触发 get 就从window上取，</li>
+<li>1.2 增加window属性触发set就会记录到addedPropsMapInSandbox，</li>
+<li>1.3 修改window属性触发set，将key和window[key]记录到modifiedPropsOriginalValueMapInSandbox，第二次修改这个属性不会再做记录</li>
+<li>1.4 将变化的数据记录到currentUpdatedPropsValueMap</li>
+<li>1.5 映射到window上以便下次 get 时能拿到已更新的数据</li>
+</ul>
+<ol start="2">
+<li>子应用卸载时，将增量的数据从window上删除，将修改过的key对应的原数据还原到window上</li>
+<li>子应用第二次加载时，通过currentUpdatedPropsValueMap恢复</li>
+</ol>
+<blockquote>
+<p>这种沙箱会影响到全局window，因为会将proxy变化映射到window上，并没有做到真正意义上的js隔离，只适用于单例模式</p>
+</blockquote>
+<h5 id="proxySandbox"><a href="#proxySandbox" class="headerlink" title="proxySandbox"></a>proxySandbox</h5><ol>
+<li>新的proxy沙箱在legacySandbox上进行了改进</li>
+</ol>
+<ul>
+<li>1.1 先记录window上不可配置的属性(Infinity、NaN、undefined、document、location等)，创建一个空的fakeWindow，浅拷贝这些不可枚举属性的值</li>
+<li>1.2 增加或者修改window属性时触发set将值记录到fakeWindow，如果这个值之前存在，直接赋值，不存在就通过Object.defineProperty创建一个descriptor</li>
+<li>1.3 get操作则会从fakeWindow或者window取</li>
+</ul>
+<blockquote>
+<p>新的proxy不会污染全局window，因为一些不可配置的属性已经被复制到fakeWindow上</p>
+</blockquote>
+<h4 id="css沙箱-css隔离"><a href="#css沙箱-css隔离" class="headerlink" title="css沙箱(css隔离)"></a>css沙箱(css隔离)</h4><p>experimentalStyleIsolation开启会让子应用的css添加scope</p>
+<h4 id="dom沙箱-shadowDom"><a href="#dom沙箱-shadowDom" class="headerlink" title="dom沙箱(shadowDom)"></a>dom沙箱(shadowDom)</h4><p>开启strictStyleIsolation可使用shadowDom对子应用进行隔离</p>
+<h3 id="应用通信"><a href="#应用通信" class="headerlink" title="应用通信"></a>应用通信</h3><h4 id="GlobalState"><a href="#GlobalState" class="headerlink" title="GlobalState"></a>GlobalState</h4><blockquote>
+<p>qiankun提供了全局state的功能，子应用可以订阅主应用的全局state，<br>globalState变化检测方法类似redux管理state树的实现，只会检测第一层数据的变化。</p>
+</blockquote>
+<blockquote>
+<p>问题是目前只适用于单例模式，只能同时存在一个订阅者</p>
+</blockquote>
+<h3 id="magic"><a href="#magic" class="headerlink" title="magic"></a>magic</h3><h4 id="qiankun如何在html内容里找到项目的入口文件呢"><a href="#qiankun如何在html内容里找到项目的入口文件呢" class="headerlink" title="qiankun如何在html内容里找到项目的入口文件呢?"></a>qiankun如何在html内容里找到项目的入口文件呢?</h4><blockquote>
+<p>通过import-html-entry解析出所有的script标签 会找出带有 「entry」属性的script标签</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;https://r.xxx.com/xxx/vendor.xxxx.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;https://r.xxx.com/xxx/xxx.app.js&quot;</span> <span class="attr">entry</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>以上情况就会知道到xxx.app.js是我们的入口文件，那如果没有设置entry呢？</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;https://r.xxx.com/xxx/vendor.xxxx.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;https://r.xxx.com/xxx/xxx.app.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>如果没有设置entry，就会默认取最后一个script标签作为入口文件，这就牵扯到打包的顺序问题了<br><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/45979159/how-to-use-chunkssortmode-in-htmlwebpackplugin-webpack-2">chunksSortMode</a></p>
+<h4 id="如何获取到子应用的钩子函数呢？"><a href="#如何获取到子应用的钩子函数呢？" class="headerlink" title="如何获取到子应用的钩子函数呢？"></a>如何获取到子应用的钩子函数呢？</h4><blockquote>
+<p>上面我们获取到了子应用entry，import-html-entry采用了<a target="_blank" rel="noopener" href="https://github.com/systemjs/systemjs/blob/master/src/extras/global.js">systemjs</a>加载动态文件的方式，<br>执行入口文件代码前记录window的第一个属性、第二个属性和最后一个属性，执行完再对比这三个属性，如果第一个第二个属性一样但是最后一个属性变化，表示是entry执行的结果，<br>则会将这个属性对应的值作为子应用入口文件export出来的钩子。</p>
+</blockquote>
+<blockquote>
+<p>然鹅这样实现有些漏洞，由于副作用或者浏览器兼容性问题<br><a target="_blank" rel="noopener" href="https://github.com/umijs/qiankun/issues/485">import-html-entry的getGlobalProp实现不合理</a><br><a target="_blank" rel="noopener" href="https://github.com/umijs/qiankun/issues/1013">global遍历顺序变化，导致子应用entry无法找到导出的生命周期函数</a><br>于是乎，qiankun增加了fallback方案，统一子应用注册的name和子应用打包时的libraryName，可在上面方案找不到时进行fallback</p>
+</blockquote>
+<h2 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h2><p><a target="_blank" rel="noopener" href="https://qiankun.umijs.org/zh/faq">常见问题汇总</a></p>
+<h2 id="RFC"><a href="#RFC" class="headerlink" title="RFC"></a>RFC</h2><p><a target="_blank" rel="noopener" href="https://github.com/umijs/qiankun/issues/442">不算完善的RFC</a></p>
+<h2 id="缺陷"><a href="#缺陷" class="headerlink" title="缺陷"></a>缺陷</h2><ol>
+<li>官网文档不是很明确，demo也不是很清晰</li>
+<li>官网文档跟新速度跟不上release发布</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/78362028">qiankun作者讲微前端</a></li>
+<li><a target="_blank" rel="noopener" href="https://xiaomi-info.github.io/2020/04/14/fe-microfrontends-practice/">微前端在小米的实践</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/" data-id="cm54s1l320009dqhg2s0z78i5" data-title="qiankun微前端实践" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/qiankun%E3%80%81micro-frontend/" rel="tag">qiankun、micro-frontend</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          悲观锁/乐观锁
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">Vue2.x之v-model详解</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/React%E3%80%81SSR/" rel="tag">React、SSR</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" rel="tag">Vue2.x、指令、v-model</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Watcher%E7%AF%87/" rel="tag">Watcher篇</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker%E3%80%81node/" rel="tag">docker、node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab-ci/" rel="tag">gitlab-ci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js%E3%80%81es6/" rel="tag">js、es6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mvvm/" rel="tag">mvvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" rel="tag">nodejs 锁 并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qiankun%E3%80%81micro-frontend/" rel="tag">qiankun、micro-frontend</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" rel="tag">react ref 笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redux%E3%80%81react/" rel="tag">redux、react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redux%E3%80%81react-redux/" rel="tag">redux、react-redux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" rel="tag">vue2.x、Observer、Dep、Watcher、个人笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex%E3%80%81takeLatest/" rel="tag">vuex、takeLatest</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue%E3%80%81lazyload/" rel="tag">vue、lazyload</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" rel="tag">vue、笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/React%E3%80%81SSR/" style="font-size: 10px;">React、SSR</a> <a href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" style="font-size: 10px;">Vue2.x、指令、v-model</a> <a href="/tags/Watcher%E7%AF%87/" style="font-size: 10px;">Watcher篇</a> <a href="/tags/docker%E3%80%81node/" style="font-size: 10px;">docker、node</a> <a href="/tags/gitlab-ci/" style="font-size: 10px;">gitlab-ci</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/js%E3%80%81es6/" style="font-size: 10px;">js、es6</a> <a href="/tags/mvvm/" style="font-size: 10px;">mvvm</a> <a href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" style="font-size: 10px;">nodejs 锁 并发</a> <a href="/tags/qiankun%E3%80%81micro-frontend/" style="font-size: 10px;">qiankun、micro-frontend</a> <a href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">react ref 笔记</a> <a href="/tags/redux%E3%80%81react/" style="font-size: 10px;">redux、react</a> <a href="/tags/redux%E3%80%81react-redux/" style="font-size: 10px;">redux、react-redux</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue2.x、Observer、Dep、Watcher、个人笔记</a> <a href="/tags/vuex%E3%80%81takeLatest/" style="font-size: 10px;">vuex、takeLatest</a> <a href="/tags/vue%E3%80%81lazyload/" style="font-size: 10px;">vue、lazyload</a> <a href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue、笔记</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/">悲观锁/乐观锁</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/">qiankun微前端实践</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/">Vue2.x之v-model详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/">Vue2.x-数据响应Watcher篇详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/">Vue2.x之数据响应篇</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 周小e丶<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

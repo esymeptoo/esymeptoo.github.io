@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>实现简单的bind函数.md | 周小e丶的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="模拟传参实现1234567Function.prototype.bind &#x3D; function (...args) &#123;	const self &#x3D; this	const bindTarget &#x3D; args.shift()	return function (...args1) &#123;		return self.apply(bindTarget, [...args, ...args1])">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实现简单的bind函数.md">
+<meta property="og:url" content="http://example.com/2018/03/10/%E5%AE%9E%E7%8E%B0%E7%AE%80%E5%8D%95%E7%9A%84bind%E5%87%BD%E6%95%B0-md/index.html">
+<meta property="og:site_name" content="周小e丶的博客">
+<meta property="og:description" content="模拟传参实现1234567Function.prototype.bind &#x3D; function (...args) &#123;	const self &#x3D; this	const bindTarget &#x3D; args.shift()	return function (...args1) &#123;		return self.apply(bindTarget, [...args, ...args1])">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-03-10T13:54:25.000Z">
+<meta property="article:modified_time" content="2024-12-26T02:38:44.281Z">
+<meta property="article:author" content="周小e丶">
+<meta property="article:tag" content="js、es6">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="周小e丶的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">周小e丶的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">coding...</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Suche"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Suche"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-实现简单的bind函数-md" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2018/03/10/%E5%AE%9E%E7%8E%B0%E7%AE%80%E5%8D%95%E7%9A%84bind%E5%87%BD%E6%95%B0-md/" class="article-date">
+  <time class="dt-published" datetime="2018-03-10T13:54:25.000Z" itemprop="datePublished">2018-03-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      实现简单的bind函数.md
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h3 id="模拟传参实现"><a href="#模拟传参实现" class="headerlink" title="模拟传参实现"></a>模拟传参实现</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Function</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">bind</span> = <span class="keyword">function</span> (<span class="params">...args</span>) &#123;</span><br><span class="line">	<span class="keyword">const</span> self = <span class="variable language_">this</span></span><br><span class="line">	<span class="keyword">const</span> bindTarget = args.<span class="title function_">shift</span>()</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">function</span> (<span class="params">...args1</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> self.<span class="title function_">apply</span>(bindTarget, [...args, ...args1])</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="完整版perf-加上构造函数作用域实现"><a href="#完整版perf-加上构造函数作用域实现" class="headerlink" title="完整版perf: 加上构造函数作用域实现"></a>完整版perf: 加上构造函数作用域实现</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Function</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">bind</span> = <span class="title class_">Function</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">bind</span> || <span class="keyword">function</span> (<span class="params">context, ...args1</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> self = <span class="variable language_">this</span></span><br><span class="line">  <span class="keyword">const</span> fBound = <span class="keyword">function</span> (<span class="params">...args2</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> self.<span class="title function_">apply</span>(context, [...args1, ...args2])</span><br><span class="line">  &#125;</span><br><span class="line">  fBound.<span class="property"><span class="keyword">prototype</span></span> = <span class="variable language_">this</span>.<span class="property"><span class="keyword">prototype</span></span></span><br><span class="line">  <span class="keyword">return</span> fBound</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2018/03/10/%E5%AE%9E%E7%8E%B0%E7%AE%80%E5%8D%95%E7%9A%84bind%E5%87%BD%E6%95%B0-md/" data-id="cm54s1l34000ldqhg4mji43em" data-title="实现简单的bind函数.md" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js%E3%80%81es6/" rel="tag">js、es6</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/04/01/vue-provide-inject/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          vue-provide/inject
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/React%E3%80%81SSR/" rel="tag">React、SSR</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" rel="tag">Vue2.x、指令、v-model</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Watcher%E7%AF%87/" rel="tag">Watcher篇</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker%E3%80%81node/" rel="tag">docker、node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gitlab-ci/" rel="tag">gitlab-ci</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js%E3%80%81es6/" rel="tag">js、es6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mvvm/" rel="tag">mvvm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" rel="tag">nodejs 锁 并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qiankun%E3%80%81micro-frontend/" rel="tag">qiankun、micro-frontend</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" rel="tag">react ref 笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redux%E3%80%81react/" rel="tag">redux、react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redux%E3%80%81react-redux/" rel="tag">redux、react-redux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" rel="tag">vue2.x、Observer、Dep、Watcher、个人笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex%E3%80%81takeLatest/" rel="tag">vuex、takeLatest</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue%E3%80%81lazyload/" rel="tag">vue、lazyload</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" rel="tag">vue、笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/React%E3%80%81SSR/" style="font-size: 10px;">React、SSR</a> <a href="/tags/Vue2-x%E3%80%81%E6%8C%87%E4%BB%A4%E3%80%81v-model/" style="font-size: 10px;">Vue2.x、指令、v-model</a> <a href="/tags/Watcher%E7%AF%87/" style="font-size: 10px;">Watcher篇</a> <a href="/tags/docker%E3%80%81node/" style="font-size: 10px;">docker、node</a> <a href="/tags/gitlab-ci/" style="font-size: 10px;">gitlab-ci</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/js%E3%80%81es6/" style="font-size: 10px;">js、es6</a> <a href="/tags/mvvm/" style="font-size: 10px;">mvvm</a> <a href="/tags/nodejs-%E9%94%81-%E5%B9%B6%E5%8F%91/" style="font-size: 10px;">nodejs 锁 并发</a> <a href="/tags/qiankun%E3%80%81micro-frontend/" style="font-size: 10px;">qiankun、micro-frontend</a> <a href="/tags/react-ref-%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">react ref 笔记</a> <a href="/tags/redux%E3%80%81react/" style="font-size: 10px;">redux、react</a> <a href="/tags/redux%E3%80%81react-redux/" style="font-size: 10px;">redux、react-redux</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/vue2-x%E3%80%81Observer%E3%80%81Dep%E3%80%81Watcher%E3%80%81%E4%B8%AA%E4%BA%BA%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue2.x、Observer、Dep、Watcher、个人笔记</a> <a href="/tags/vuex%E3%80%81takeLatest/" style="font-size: 10px;">vuex、takeLatest</a> <a href="/tags/vue%E3%80%81lazyload/" style="font-size: 10px;">vue、lazyload</a> <a href="/tags/vue%E3%80%81%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">vue、笔记</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/18/%E6%82%B2%E8%A7%82%E9%94%81-%E4%B9%90%E8%A7%82%E9%94%81/">悲观锁/乐观锁</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/23/qiankun%E5%BE%AE%E5%89%8D%E7%AB%AF%E5%88%9D%E6%8E%A2/">qiankun微前端实践</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/19/Vue2-x%E4%B9%8Bv-model%E8%AF%A6%E8%A7%A3/">Vue2.x之v-model详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/18/Vue2-x-%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94Watcher%E7%AF%87%E8%AF%A6%E8%A7%A3/">Vue2.x-数据响应Watcher篇详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/16/Vue2-x%E4%B9%8B%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E7%AF%87/">Vue2.x之数据响应篇</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 周小e丶<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
